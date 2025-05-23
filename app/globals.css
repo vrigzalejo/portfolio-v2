@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
@@ -21,6 +22,7 @@
 
 html {
   scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
@@ -56,10 +58,10 @@ button, a {
   50% { transform: translateY(-20px); }
 }
 
-.parallax-bg {
+.gradient-shift-bg {
   background: linear-gradient(-45deg, #0f0f23, #1a1a2e, #16213e, #0f3460);
   background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  animation: gradientShift 5s ease infinite;
 }
 
 @keyframes gradientShift {
@@ -104,3 +106,8 @@ button, a {
   40% { transform: translateY(-10px); }
   60% { transform: translateY(-5px); }
 }
+
+.section-bg {
+  @apply min-h-screen flex items-center justify-center relative;
+}
+

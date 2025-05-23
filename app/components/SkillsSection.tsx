@@ -1,3 +1,5 @@
+import { ClipPathBorders } from "./ClipPathBorders"
+
 interface Skill {
     name: string
     emoji: string
@@ -8,29 +10,38 @@ const skills: Skill[] = [
     { name: 'React', emoji: '⚛️', gradient: 'from-blue-500 to-blue-700' },
     { name: 'Node.js', emoji: '🟢', gradient: 'from-green-500 to-green-700' },
     { name: 'Three.js', emoji: '🎯', gradient: 'from-purple-500 to-purple-700' },
-    { name: 'JavaScript', emoji: '⚡', gradient: 'from-yellow-500 to-orange-600' },
-    { name: 'TypeScript', emoji: '📘', gradient: 'from-blue-500 to-purple-600' },
-    { name: 'CSS/Tailwind', emoji: '🎨', gradient: 'from-pink-500 to-red-600' },
+    { name: 'JavaScript', emoji: '⚡', gradient: 'from-yellow-400 to-orange-500' },
+    { name: 'TypeScript', emoji: '📘', gradient: 'from-blue-400 to-purple-500' },
+    { name: 'CSS/Tailwind', emoji: '🎨', gradient: 'from-pink-400 to-red-500' },
 ]
 
 export default function SkillsSection() {
     return (
-        <section id="skills" className="py-50 px-4">
-            <div className="max-w-6xl mx-auto">
-                <h2 className="text-4xl md:text-6xl pb-1 font-bold text-center mb-16 gradient-text">
-                    Skills & Technologies
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
-                    {skills.map((skill, index) => (
-                        <div key={index} className="skill-orb text-center">
-                            <div className={`w-20 h-20 mx-auto mb-4 bg-gradient-to-br ${skill.gradient} rounded-full flex items-center justify-center text-2xl`}>
-                                {skill.emoji}
+        <ClipPathBorders>
+            <section id="skills" className="section-bg">
+                <div className="max-w-6xl mx-auto text-center">
+                    <h2 className="text-4xl md:text-5xl font-bold mb-14 pb-1 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-fade-in">
+                        🚀 Skills & Technologies
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
+                        {skills.map((skill, index) => (
+                            <div
+                                key={index}
+                                className="group transition-transform duration-300 hover:scale-105 animate-fade-up"
+                            >
+                                <div
+                                    className={`w-20 h-20 mx-auto mb-3 bg-gradient-to-br ${skill.gradient} rounded-full flex items-center justify-center text-3xl shadow-lg group-hover:shadow-xl transition-shadow`}
+                                >
+                                    {skill.emoji}
+                                </div>
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
+                                    {skill.name}
+                                </span>
                             </div>
-                            <span className="text-sm">{skill.name}</span>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </ClipPathBorders>
     )
-  }
+}

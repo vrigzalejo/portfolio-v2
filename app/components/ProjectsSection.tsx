@@ -1,3 +1,5 @@
+import { ClipPathBorders } from "./ClipPathBorders"
+
 interface Project {
     id: number
     title: string
@@ -48,36 +50,38 @@ const tagColors: { [key: string]: string } = {
 
 export default function ProjectsSection() {
     return (
-        <section id="projects" className="py-50 px-4 bg-black/90">
-            <div className="max-w-6xl mx-auto">
-                <h2 className="text-4xl md:text-6xl pb-1 font-bold text-center mb-16 gradient-text">
-                    Featured Projects
-                </h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {projects.map((project) => (
-                        <div key={project.id} className="project-card glass-effect p-6 rounded-2xl">
-                            <div className={`h-48 bg-gradient-to-br ${project.gradient} rounded-xl mb-6 flex items-center justify-center`}>
-                                <span className="text-4xl">{project.emoji}</span>
+        <ClipPathBorders>
+            <section id="projects" className="section-bg">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl pb-1 font-bold text-center mb-14 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-fade-in">
+                        🚀 Featured Projects
+                    </h2>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {projects.map((project) => (
+                            <div key={project.id} className="project-card glass-effect p-6 rounded-2xl">
+                                <div className={`h-48 bg-gradient-to-br ${project.gradient} rounded-xl mb-6 flex items-center justify-center`}>
+                                    <span className="text-4xl">{project.emoji}</span>
+                                </div>
+                                <h3 className="text-xl font-semibold mb-3">{project.title}</h3>
+                                <p className="text-gray-400 mb-4">{project.description}</p>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {project.tags.map((tag) => (
+                                        <span
+                                            key={tag}
+                                            className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600/30'} rounded-full text-sm`}
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                                <button className="w-full py-2 glass-effect rounded-lg hover:bg-white/20 transition-all">
+                                    View Project
+                                </button>
                             </div>
-                            <h3 className="text-xl font-semibold mb-3">{project.title}</h3>
-                            <p className="text-gray-400 mb-4">{project.description}</p>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {project.tags.map((tag) => (
-                                    <span
-                                        key={tag}
-                                        className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600/30'} rounded-full text-sm`}
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                            <button className="w-full py-2 glass-effect rounded-lg hover:bg-white/20 transition-all">
-                                View Project
-                            </button>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </ClipPathBorders>
     )
 }

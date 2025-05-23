@@ -4,7 +4,6 @@ import AboutSection from '@/components/AboutSection'
 import ProjectsSection from '@/components/ProjectsSection'
 import SkillsSection from '@/components/SkillsSection'
 import ContactSection from '@/components/ContactSection'
-import ParallaxEffects from '@/components/ParallaxEffects'
 import ThreeBackground from './components/ThreeBackground'
 
 export default function Home() {
@@ -24,7 +23,6 @@ export default function Home() {
           <p className="text-gray-400">© {new Date().getFullYear()} Brigido Alejo</p>
         </div>
       </footer>
-      <ParallaxEffects />
     </>
   )
 }
