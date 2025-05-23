@@ -35,22 +35,22 @@ const projects: Project[] = [
 ]
 
 const tagColors: { [key: string]: string } = {
-    'React': 'bg-purple-600 bg-opacity-30',
-    'Three.js': 'bg-blue-600 bg-opacity-30',
-    'WebGL': 'bg-green-600 bg-opacity-30',
-    'TypeScript': 'bg-purple-600 bg-opacity-30',
-    'Canvas API': 'bg-blue-600 bg-opacity-30',
-    'Physics': 'bg-red-600 bg-opacity-30',
-    'Vue.js': 'bg-purple-600 bg-opacity-30',
-    'D3.js': 'bg-blue-600 bg-opacity-30',
-    'WebSockets': 'bg-yellow-600 bg-opacity-30'
+    'React': 'bg-purple-600/30',
+    'Three.js': 'bg-blue-600/30',
+    'WebGL': 'bg-green-600/30',
+    'TypeScript': 'bg-purple-600/30',
+    'Canvas API': 'bg-blue-600/30',
+    'Physics': 'bg-red-600/30',
+    'Vue.js': 'bg-purple-600/30',
+    'D3.js': 'bg-blue-600/30',
+    'WebSockets': 'bg-yellow-600/30'
 }
 
 export default function ProjectsSection() {
     return (
-        <section id="projects" className="py-20 px-4 bg-black bg-opacity-50">
+        <section id="projects" className="py-50 px-4 bg-black/90">
             <div className="max-w-6xl mx-auto">
-                <h2 className="text-4xl md:text-6xl font-bold text-center mb-16 gradient-text">
+                <h2 className="text-4xl md:text-6xl pb-1 font-bold text-center mb-16 gradient-text">
                     Featured Projects
                 </h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -65,13 +65,13 @@ export default function ProjectsSection() {
                                 {project.tags.map((tag) => (
                                     <span
                                         key={tag}
-                                        className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600 bg-opacity-30'} rounded-full text-sm`}
+                                        className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600/30'} rounded-full text-sm`}
                                     >
                                         {tag}
                                     </span>
                                 ))}
                             </div>
-                            <button className="w-full py-2 glass-effect rounded-lg hover:bg-white hover:bg-opacity-20 transition-all">
+                            <button className="w-full py-2 glass-effect rounded-lg hover:bg-white/20 transition-all">
                                 View Project
                             </button>
                         </div>

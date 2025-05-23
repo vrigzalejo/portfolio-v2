@@ -5,12 +5,12 @@ import ProjectsSection from '@/components/ProjectsSection'
 import SkillsSection from '@/components/SkillsSection'
 import ContactSection from '@/components/ContactSection'
 import ParallaxEffects from '@/components/ParallaxEffects'
-import ThreeBackgroundWrapper from './components/ThreeBackgroundWrapper'
+import ThreeBackground from './components/ThreeBackground'
 
 export default function Home() {
   return (
     <>
-      <ThreeBackgroundWrapper />
+      <ThreeBackground />
       <Navigation />
       <main>
         <HeroSection />
@@ -19,7 +19,7 @@ export default function Home() {
         <SkillsSection />
         <ContactSection />
       </main>
-      <footer className="py-8 px-4 border-t border-gray-800">
+      <footer className="py-8 px-4 border-t border-gray-800 glass-effect ">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-gray-400">© {new Date().getFullYear()} Brigido Alejo</p>
         </div>

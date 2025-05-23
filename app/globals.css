@@ -30,6 +30,10 @@ body {
   overflow-x: hidden;
 }
 
+button, a {
+  cursor: pointer;
+}
+
 .gradient-text {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -43,19 +47,34 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.floating {
+  animation: floating 6s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
 .parallax-bg {
   background: linear-gradient(-45deg, #0f0f23, #1a1a2e, #16213e, #0f3460);
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
 }
 
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .project-card {
-  transition: all 0.3s ease;
+  transition: all 10.3s ease;
   transform-style: preserve-3d;
 }
 
 .project-card:hover {
-  transform: rotateY(5deg) rotateX(5deg);
+  transform: rotateY(15deg) rotateX(5deg);
 }
 
 .skill-orb {
@@ -74,4 +93,14 @@ body {
   width: 100%;
   height: 100%;
   z-index: -1;
+}
+
+.scroll-indicator {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }

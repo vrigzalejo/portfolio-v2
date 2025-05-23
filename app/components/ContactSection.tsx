@@ -12,9 +12,9 @@ const contactMethods: ContactMethod[] = [
 
 export default function ContactSection() {
     return (
-        <section id="contact" className="py-20 px-4 bg-black bg-opacity-50">
+        <section id="contact" className="py-50 px-4 bg-black/50">
             <div className="max-w-4xl mx-auto text-center">
-                <h2 className="text-4xl md:text-6xl font-bold mb-8 gradient-text">
+                <h2 className="text-4xl pb-1 md:text-6xl font-bold mb-8 gradient-text">
                     Let's Work Together
                 </h2>
                 <p className="text-xl text-gray-300 mb-12">
