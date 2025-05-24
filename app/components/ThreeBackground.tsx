@@ -1,23 +1,41 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 export default function ThreeBackground() {
     const containerRef = useRef<HTMLDivElement>(null)
-    const sceneRef = useRef<THREE.Scene>()
-    const rendererRef = useRef<THREE.WebGLRenderer>()
-    const cameraRef = useRef<THREE.PerspectiveCamera>()
-    const particlesRef = useRef<THREE.Points>()
-    const animationIdRef = useRef<number>()
+    const sceneRef = useRef<THREE.Scene>(null)
+    const rendererRef = useRef<THREE.WebGLRenderer>(null)
+    const cameraRef = useRef<THREE.PerspectiveCamera>(null)
+    const particlesRef = useRef<THREE.Points>(null)
+    const animationIdRef = useRef<number>(null)
     const mouseRef = useRef({ x: 0, y: 0 })
     const targetRotationRef = useRef({ x: 0, y: 0 })
+    const timeRef = useRef(0)
+    const [isDarkMode, setIsDarkMode] = useState(false)
 
     useEffect(() => {
         if (!containerRef.current) return
 
+        // Detect initial theme
+        const checkTheme = () => {
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches ||
+                document.documentElement.classList.contains('dark') ||
+                document.body.classList.contains('dark')
+            setIsDarkMode(isDark)
+            return isDark
+        }
+
+        const initialDarkMode = checkTheme()
+
         // Scene setup
         const scene = new THREE.Scene()
+
+        // Set background color based on theme
+        const bgColor = initialDarkMode ? 0x0a0a0a : 0xf8f9fa
+        scene.background = new THREE.Color(bgColor)
+
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
 
@@ -30,25 +48,79 @@ export default function ThreeBackground() {
         const particleCount = 1000
         const positions = new Float32Array(particleCount * 3)
         const colors = new Float32Array(particleCount * 3)
+        const originalPositions = new Float32Array(particleCount * 3)
+
+        // Theme-based color generation
+        const generateParticleColors = (isDark: boolean) => {
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                if (isDark) {
+                    // Dark mode: bright, vibrant colors
+                    const colorVariant = Math.random()
+                    if (colorVariant < 0.33) {
+                        // Cyan/blue
+                        colors[i] = 0.2 + Math.random() * 0.3     // R
+                        colors[i + 1] = 0.6 + Math.random() * 0.4 // G
+                        colors[i + 2] = 0.8 + Math.random() * 0.2 // B
+                    } else if (colorVariant < 0.66) {
+                        // Purple/magenta
+                        colors[i] = 0.6 + Math.random() * 0.4     // R
+                        colors[i + 1] = 0.2 + Math.random() * 0.3 // G
+                        colors[i + 2] = 0.8 + Math.random() * 0.2 // B
+                    } else {
+                        // Green/teal
+                        colors[i] = 0.2 + Math.random() * 0.3     // R
+                        colors[i + 1] = 0.7 + Math.random() * 0.3 // G
+                        colors[i + 2] = 0.5 + Math.random() * 0.3 // B
+                    }
+                } else {
+                    // Light mode: softer, muted colors
+                    const colorVariant = Math.random()
+                    if (colorVariant < 0.33) {
+                        // Soft blue/gray
+                        colors[i] = 0.4 + Math.random() * 0.3     // R
+                        colors[i + 1] = 0.5 + Math.random() * 0.3 // G
+                        colors[i + 2] = 0.7 + Math.random() * 0.2 // B
+                    } else if (colorVariant < 0.66) {
+                        // Warm gray/brown
+                        colors[i] = 0.5 + Math.random() * 0.3     // R
+                        colors[i + 1] = 0.4 + Math.random() * 0.3 // G
+                        colors[i + 2] = 0.3 + Math.random() * 0.3 // B
+                    } else {
+                        // Soft green/gray
+                        colors[i] = 0.4 + Math.random() * 0.2     // R
+                        colors[i + 1] = 0.6 + Math.random() * 0.2 // G
+                        colors[i + 2] = 0.4 + Math.random() * 0.3 // B
+                    }
+                }
+            }
+        }
 
         for (let i = 0; i < particleCount * 3; i += 3) {
-            positions[i] = (Math.random() - 0.5) * 100
-            positions[i + 1] = (Math.random() - 0.5) * 100
-            positions[i + 2] = (Math.random() - 0.5) * 100
+            const x = (Math.random() - 0.5) * 100
+            const y = (Math.random() - 0.5) * 100
+            const z = (Math.random() - 0.5) * 100
 
-            colors[i] = Math.random() * 0.5 + 0.5
-            colors[i + 1] = Math.random() * 0.5 + 0.5
-            colors[i + 2] = 1
+            positions[i] = x
+            positions[i + 1] = y
+            positions[i + 2] = z
+
+            // Store original positions for wave movement
+            originalPositions[i] = x
+            originalPositions[i + 1] = y
+            originalPositions[i + 2] = z
         }
+
+        generateParticleColors(initialDarkMode)
 
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
         geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
         const material = new THREE.PointsMaterial({
-            size: 2,
+            size: initialDarkMode ? 3 : 2,
             vertexColors: true,
             transparent: true,
-            opacity: 0.8
+            opacity: initialDarkMode ? 0.9 : 0.6,
+            blending: initialDarkMode ? THREE.AdditiveBlending : THREE.NormalBlending
         })
 
         const particles = new THREE.Points(geometry, material)
@@ -61,6 +133,39 @@ export default function ThreeBackground() {
         rendererRef.current = renderer
         cameraRef.current = camera
         particlesRef.current = particles
+
+        // Theme change handler
+        const handleThemeChange = () => {
+            const newDarkMode = checkTheme()
+            if (newDarkMode !== isDarkMode) {
+                // Update background color
+                scene.background = new THREE.Color(newDarkMode ? 0x0a0a0a : 0xf8f9fa)
+
+                // Update particle colors
+                generateParticleColors(newDarkMode)
+                particles.geometry.attributes.color.needsUpdate = true
+
+                // Update material properties
+                material.size = newDarkMode ? 3 : 2
+                material.opacity = newDarkMode ? 0.9 : 0.6
+                material.blending = newDarkMode ? THREE.AdditiveBlending : THREE.NormalBlending
+                material.needsUpdate = true
+            }
+        }
+
+        // Listen for theme changes
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+        const observer = new MutationObserver(handleThemeChange)
+
+        mediaQuery.addEventListener('change', handleThemeChange)
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        })
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        })
 
         // Mouse movement handler
         const handleMouseMove = (event: MouseEvent) => {
@@ -76,29 +181,56 @@ export default function ThreeBackground() {
         // Animation loop
         const animate = () => {
             animationIdRef.current = requestAnimationFrame(animate)
+            timeRef.current += 0.01
 
             if (particlesRef.current && cameraRef.current) {
+                // Animate individual particle positions with wave motion
+                const positions = particlesRef.current.geometry.attributes.position.array as Float32Array
+
+                // Adjust movement intensity based on theme
+                const movementIntensity = isDarkMode ? 3 : 1.5
+                const speedMultiplier = isDarkMode ? 1.2 : 0.8
+
+                for (let i = 0; i < positions.length; i += 3) {
+                    const index = i / 3
+
+                    // Create wave movement based on original positions and time
+                    positions[i] = originalPositions[i] + Math.sin(timeRef.current * speedMultiplier + index * 0.01) * movementIntensity
+                    positions[i + 1] = originalPositions[i + 1] + Math.cos(timeRef.current * speedMultiplier + index * 0.008) * movementIntensity
+                    positions[i + 2] = originalPositions[i + 2] + Math.sin(timeRef.current * speedMultiplier * 0.5 + index * 0.005) * (movementIntensity * 1.5)
+                }
+
+                particlesRef.current.geometry.attributes.position.needsUpdate = true
+
                 // Smooth interpolation for particle rotation
                 particlesRef.current.rotation.x += (targetRotationRef.current.x - particlesRef.current.rotation.x) * 0.05
                 particlesRef.current.rotation.y += (targetRotationRef.current.y - particlesRef.current.rotation.y) * 0.05
 
-                // Add continuous slow rotation
-                particlesRef.current.rotation.x += 0.001
-                particlesRef.current.rotation.y += 0.002
+                // Add continuous slow rotation (faster in dark mode)
+                const rotationSpeed = isDarkMode ? 0.003 : 0.002
+                particlesRef.current.rotation.x += rotationSpeed
+                particlesRef.current.rotation.y += rotationSpeed * 1.5
 
-                // Camera movement based on mouse
-                const targetCameraX = mouseRef.current.x * 2
-                const targetCameraY = mouseRef.current.y * 2
+                // Camera movement based on mouse with some automatic drift
+                const driftIntensity = isDarkMode ? 0.8 : 0.4
+                const targetCameraX = mouseRef.current.x * 2 + Math.sin(timeRef.current * 0.3) * driftIntensity
+                const targetCameraY = mouseRef.current.y * 2 + Math.cos(timeRef.current * 0.2) * driftIntensity
 
                 cameraRef.current.position.x += (targetCameraX - cameraRef.current.position.x) * 0.05
                 cameraRef.current.position.y += (targetCameraY - cameraRef.current.position.y) * 0.05
 
-                // Make camera look at the center with slight offset
+                // Make camera look at the center with slight offset and automatic movement
+                const lookAtIntensity = isDarkMode ? 3 : 2
                 cameraRef.current.lookAt(
-                    mouseRef.current.x * 5,
-                    mouseRef.current.y * 5,
+                    mouseRef.current.x * 5 + Math.sin(timeRef.current * 0.4) * lookAtIntensity,
+                    mouseRef.current.y * 5 + Math.cos(timeRef.current * 0.3) * lookAtIntensity,
                     0
                 )
+
+                // Add some pulsing to the particle size (more dramatic in dark mode)
+                const baseSizes = isDarkMode ? 3 : 2
+                const pulseIntensity = isDarkMode ? 1 : 0.5
+                material.size = baseSizes + Math.sin(timeRef.current * 2) * pulseIntensity
             }
 
             renderer.render(scene, camera)
@@ -125,6 +257,8 @@ export default function ThreeBackground() {
             }
             window.removeEventListener('mousemove', handleMouseMove)
             window.removeEventListener('resize', handleResize)
+            mediaQuery.removeEventListener('change', handleThemeChange)
+            observer.disconnect()
 
             if (containerRef.current && rendererRef.current) {
                 containerRef.current.removeChild(rendererRef.current.domElement)

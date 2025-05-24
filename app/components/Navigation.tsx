@@ -5,6 +5,7 @@ import ThemeToggle from './ThemeToggle'
 
 const navItems = [
     { href: '#home', label: 'Home', icon: '🏠' },
+    { href: '#work', label: 'Work', icon: '🛠️' },
     { href: '#about', label: 'About', icon: '👤' },
     { href: '#projects', label: 'Projects', icon: '🚀' },
     { href: '#skills', label: 'Skills', icon: '⚡' },

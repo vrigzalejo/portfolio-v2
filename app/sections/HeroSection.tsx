@@ -1,6 +1,7 @@
 'use client'
 
-import { ClipPathBorders } from "./ClipPathBorders"
+import TypewriterGlow from "@/components/TypewriterGlow"
+import { ClipPathBorders } from "../components/ClipPathBorders"
 
 export default function HeroSection() {
     const scrollToProjects = () => {
@@ -10,17 +11,25 @@ export default function HeroSection() {
         }
     }
 
+    const texts = [
+        "Welcome to the Future",
+        "Full-Stack Developer",
+        "Building Amazing Experiences",
+        "Code. Create. Innovate."
+    ];
+
+    const title = "Brigido Alejo"
+
     return (
         <ClipPathBorders topHeight="0">
             <section id="home" className="section-bg">
                 <div className="text-center z-10">
                     <div className="floating">
-                        <h1 className="text-6xl md:text-8xl font-bold mb-6">
-                            <span className="gradient-text">Brigido Alejo</span>
-                        </h1>
-                        <p className="text-xl md:text-2xl mb-8 text-gray-300">
-                            Full Stack Developer & 3D Designer
-                        </p>
+                        <div className="wave-text text-6xl md:text-8xl font-bold mb-12">
+                            <h1>{title}</h1>
+                            <h1>{title}</h1>
+                        </div>
+                        <TypewriterGlow styles="mt-5 mb-10" texts={texts}/>
                         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
                             <button
                                 onClick={scrollToProjects}

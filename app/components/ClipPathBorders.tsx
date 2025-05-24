@@ -3,87 +3,87 @@
 import React from 'react'
 
 interface ClipPathBordersProps {
-    topGradient?: string
-    topGlowGradient?: string
-    bottomGradient?: string
-    topHeight?: string
-    bottomHeight?: string
-    topPattern?: string
-    bottomPattern?: string
-    enableGlow?: boolean
-    enableShimmer?: boolean
-    autoMove?: boolean
-    animationDuration?: string
-    children: React.ReactNode
+  topGradient?: string
+  topGlowGradient?: string
+  bottomGradient?: string
+  topHeight?: string
+  bottomHeight?: string
+  topPattern?: string
+  bottomPattern?: string
+  enableGlow?: boolean
+  enableShimmer?: boolean
+  autoMove?: boolean
+  animationDuration?: string
+  children: React.ReactNode
 }
 
 const ClipPathBorders: React.FC<ClipPathBordersProps> = ({
-    topGradient = "transparent",
-    topGlowGradient = "from-cyan-400/20 via-purple-400/30 to-orange-400/20",
-    bottomGradient = "transparent",
-    topHeight = "h-14",
-    bottomHeight = "h-14",
-    topPattern = "polygon(0% 100%, 5% 90%, 10% 95%, 15% 85%, 20% 92%, 25% 82%, 30% 88%, 35% 78%, 40% 85%, 45% 75%, 50% 80%, 55% 70%, 60% 77%, 65% 67%, 70% 73%, 75% 63%, 80% 70%, 85% 60%, 90% 67%, 95% 57%, 100% 63%, 100% 0%, 0% 0%)",
-    bottomPattern = "polygon(0% 0%, 5% 10%, 10% 5%, 15% 15%, 20% 8%, 25% 18%, 30% 12%, 35% 22%, 40% 15%, 45% 25%, 50% 20%, 55% 30%, 60% 23%, 65% 33%, 70% 27%, 75% 37%, 80% 30%, 85% 40%, 90% 33%, 95% 43%, 100% 37%, 100% 100%, 0% 100%)",
-    enableGlow = true,
-    enableShimmer = true,
-    autoMove = true,
-    animationDuration = "1s",
-    children
+  topGradient = "transparent",
+  topGlowGradient = "from-cyan-400/20 via-purple-400/30 to-orange-400/20",
+  bottomGradient = "transparent",
+  topHeight = "h-14",
+  bottomHeight = "h-14",
+  topPattern = "polygon(0% 100%, 5% 90%, 10% 95%, 15% 85%, 20% 92%, 25% 82%, 30% 88%, 35% 78%, 40% 85%, 45% 75%, 50% 80%, 55% 70%, 60% 77%, 65% 67%, 70% 73%, 75% 63%, 80% 70%, 85% 60%, 90% 67%, 95% 57%, 100% 63%, 100% 0%, 0% 0%)",
+  bottomPattern = "polygon(0% 0%, 5% 10%, 10% 5%, 15% 15%, 20% 8%, 25% 18%, 30% 12%, 35% 22%, 40% 15%, 45% 25%, 50% 20%, 55% 30%, 60% 23%, 65% 33%, 70% 27%, 75% 37%, 80% 30%, 85% 40%, 90% 33%, 95% 43%, 100% 37%, 100% 100%, 0% 100%)",
+  enableGlow = true,
+  enableShimmer = true,
+  autoMove = true,
+  animationDuration = "1s",
+  children
 }) => {
-    return (
-        <div className="relative">
-            {/* Top Border */}
-            <div className={`absolute top-0 left-0 w-full ${topHeight} overflow-hidden z-10`}>
-                <div
-                    className={`absolute inset-0 bg-gradient-to-r ${topGradient}`}
-                    style={{
-                        clipPath: topPattern,
-                        animation: autoMove ? `wave-motion ${animationDuration} ease-in-out infinite` : undefined,
-                        width: '200%'
-                    }}
-                />
-                {enableGlow && (
-                    <div
-                        className={`absolute inset-0 bg-gradient-to-r ${topGlowGradient} blur-sm`}
-                        style={{
-                            clipPath: topPattern,
-                            animation: autoMove ? `wave-motion ${animationDuration} ease-in-out infinite` : undefined,
-                            width: '200%'
-                        }}
-                    />
-                )}
-            </div>
+  return (
+    <div className="relative">
+      {/* Top Border */}
+      <div className={`absolute top-0 left-0 w-full ${topHeight} overflow-hidden z-10`}>
+        <div
+          className={`absolute inset-0 bg-gradient-to-r ${topGradient}`}
+          style={{
+            clipPath: topPattern,
+            animation: autoMove ? `wave-motion ${animationDuration} ease-in-out infinite` : undefined,
+            width: '200%'
+          }}
+        />
+        {enableGlow && (
+          <div
+            className={`absolute inset-0 bg-gradient-to-r ${topGlowGradient} blur-sm`}
+            style={{
+              clipPath: topPattern,
+              animation: autoMove ? `wave-motion ${animationDuration} ease-in-out infinite` : undefined,
+              width: '200%'
+            }}
+          />
+        )}
+      </div>
 
-            {/* Content */}
-            <div className="relative z-0">
-                {children}
-            </div>
+      {/* Content */}
+      <div className="relative z-0">
+        {children}
+      </div>
 
-            {/* Bottom Border */}
-            <div className={`absolute bottom-0 left-0 w-full ${bottomHeight} overflow-hidden z-10`}>
-                <div
-                    className={`absolute inset-0 bg-gradient-to-r ${bottomGradient}`}
-                    style={{
-                        clipPath: bottomPattern,
-                        animation: autoMove ? `wave-motion-reverse ${animationDuration} ease-in-out infinite` : undefined,
-                        width: '200%'
-                    }}
-                />
-                {enableShimmer && (
-                    <div
-                        className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent`}
-                        style={{
-                            clipPath: bottomPattern,
-                            animation: autoMove ? `shimmer-wave 3s ease-in-out infinite, wave-motion-reverse ${animationDuration} ease-in-out infinite` : 'shimmer 3s ease-in-out infinite',
-                            width: '200%'
-                        }}
-                    />
-                )}
-            </div>
+      {/* Bottom Border */}
+      <div className={`absolute bottom-0 left-0 w-full ${bottomHeight} overflow-hidden z-10`}>
+        <div
+          className={`absolute inset-0 bg-gradient-to-r ${bottomGradient}`}
+          style={{
+            clipPath: bottomPattern,
+            animation: autoMove ? `wave-motion-reverse ${animationDuration} ease-in-out infinite` : undefined,
+            width: '200%'
+          }}
+        />
+        {enableShimmer && (
+          <div
+            className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent`}
+            style={{
+              clipPath: bottomPattern,
+              animation: autoMove ? `shimmer-wave 3s ease-in-out infinite, wave-motion-reverse ${animationDuration} ease-in-out infinite` : 'shimmer 3s ease-in-out infinite',
+              width: '200%'
+            }}
+          />
+        )}
+      </div>
 
-            {/* Wave Animation Styles */}
-            <style jsx>{`
+      {/* Wave Animation Styles */}
+      <style jsx>{`
         @keyframes wave-motion {
           0% { 
             transform: translateX(-50%);
@@ -134,8 +134,8 @@ const ClipPathBorders: React.FC<ClipPathBordersProps> = ({
           50% { transform: translateX(100%); }
         }
       `}</style>
-        </div>
-    )
+    </div>
+  )
 }
 
 export { ClipPathBorders }

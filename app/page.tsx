@@ -1,10 +1,11 @@
 import Navigation from '@/components/Navigation'
-import HeroSection from '@/components/HeroSection'
-import AboutSection from '@/components/AboutSection'
-import ProjectsSection from '@/components/ProjectsSection'
-import SkillsSection from '@/components/SkillsSection'
-import ContactSection from '@/components/ContactSection'
+import HeroSection from '@/sections/HeroSection'
+import AboutSection from '@/sections/AboutSection'
+import ProjectsSection from '@/sections/ProjectsSection'
+import SkillsSection from '@/sections/SkillsSection'
+import ContactSection from '@/sections/ContactSection'
 import ThreeBackground from './components/ThreeBackground'
+import WorkSection from './sections/WorkSection'
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Navigation />
       <main>
         <HeroSection />
+        <WorkSection />
         <AboutSection />
         <ProjectsSection />
         <SkillsSection />

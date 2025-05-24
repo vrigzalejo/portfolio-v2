@@ -1,4 +1,4 @@
-import { ClipPathBorders } from "./ClipPathBorders"
+import { ClipPathBorders } from "../components/ClipPathBorders"
 
 interface ContactMethod {
     emoji: string
@@ -12,14 +12,17 @@ const contactMethods: ContactMethod[] = [
     { emoji: '🐙', title: 'GitHub', info: '@vrigzalejo' },
 ]
 
+const title = '📧 Let\'s Work Together'
+
 export default function ContactSection() {
     return (
         <ClipPathBorders bottomHeight="0">
             <section id="contact" className="section-bg">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-4xl md:text-5xl pb-1 font-bold text-center mb-14 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-fade-in">
-                        Let's Work Together
-                    </h2>
+                    <div className="wave-text text-4xl md:text-5xl pb-1 mb-14 font-bold">
+                        <h2>{title}</h2>
+                        <h2>{title}</h2>
+                    </div>
                     <p className="text-xl text-gray-300 mb-12">
                         Ready to bring your next project to life? Let's create something amazing together.
                     </p>

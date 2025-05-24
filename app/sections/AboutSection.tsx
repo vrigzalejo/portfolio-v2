@@ -1,4 +1,7 @@
-import { ClipPathBorders } from "./ClipPathBorders"
+'use client'
+
+import { ClipPathBorders } from "../components/ClipPathBorders"
+import Timeline from '@/components/Timeline';
 
 export default function AboutSection() {
     const stats = [
@@ -7,13 +10,17 @@ export default function AboutSection() {
         { number: '100+', label: 'Clients', color: 'text-green-400' },
     ]
 
+    const title = '👤 About Me'
+
     return (
         <ClipPathBorders>
             <section id="about" className="section-bg">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-4xl md:text-5xl pb-1 font-bold text-center mb-14 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-fade-in">
-                        About Me
-                    </h2>
+                    <div className="wave-text text-4xl md:text-5xl pb-1 mb-14 font-bold">
+                        <h2>{title}</h2>
+                        <h2>{title}</h2>
+                    </div>
+
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="glass-effect p-8 rounded-2xl">
                             <h3 className="text-2xl font-semibold mb-6">Creative Developer</h3>

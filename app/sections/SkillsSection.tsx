@@ -1,4 +1,4 @@
-import { ClipPathBorders } from "./ClipPathBorders"
+import { ClipPathBorders } from "../components/ClipPathBorders"
 
 interface Skill {
     name: string
@@ -15,14 +15,18 @@ const skills: Skill[] = [
     { name: 'CSS/Tailwind', emoji: '🎨', gradient: 'from-pink-400 to-red-500' },
 ]
 
+
+const title = '⚡ Skills & Technologies'
+
 export default function SkillsSection() {
     return (
         <ClipPathBorders>
             <section id="skills" className="section-bg">
                 <div className="max-w-6xl mx-auto text-center">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-14 pb-1 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-fade-in">
-                        🚀 Skills & Technologies
-                    </h2>
+                    <div className="wave-text text-4xl md:text-5xl pb-1 mb-14 font-bold">
+                        <h2>{title}</h2>
+                        <h2>{title}</h2>
+                    </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
                         {skills.map((skill, index) => (
                             <div
