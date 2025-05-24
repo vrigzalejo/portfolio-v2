@@ -1,7 +1,6 @@
 'use client'
 
 import { ClipPathBorders } from "../components/ClipPathBorders"
-import Timeline from '@/components/Timeline';
 
 export default function AboutSection() {
     const stats = [
