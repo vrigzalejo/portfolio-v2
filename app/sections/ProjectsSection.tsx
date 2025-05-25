@@ -1,3 +1,4 @@
+import WaveText from "@/components/WaveText"
 import { ClipPathBorders } from "../components/ClipPathBorders"
 
 interface Project {
@@ -55,10 +56,7 @@ export default function ProjectsSection() {
         <ClipPathBorders>
             <section id="projects" className="section-bg">
                 <div className="max-w-6xl mx-auto">
-                    <div className="wave-text text-4xl md:text-5xl pb-1 mb-14 font-bold">
-                        <h2>{title}</h2>
-                        <h2>{title}</h2>
-                    </div>
+                    <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {projects.map((project) => (
                             <div key={project.id} className="project-card glass-effect p-6 rounded-2xl">

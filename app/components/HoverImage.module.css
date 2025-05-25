@@ -1,0 +1,117 @@
+.hover_container {
+    position: relative;
+    width: 16rem;
+    height: 16rem;
+    margin: auto;
+}
+
+.hover_border {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    padding: 1px;
+}
+
+.hover_borderInner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    dark-mode: background-color rgba(0, 0, 0, 0.2);
+}
+
+.hover_content {
+    position: absolute;
+    inset: 0.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.hover_image {
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.hover_innerGlow {
+    position: absolute;
+    inset: 0.5rem;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hover_innerGlowContent {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Glow Effect */
+.hover_glow {
+    filter: drop-shadow(0 0 20px rgba(255, 0, 110, 0.5));
+}
+
+.group:hover .hover_glow {
+    filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+    transition: filter 0.3s ease;
+}
+
+/* Animated Borders */
+.border_rotating {
+    background: conic-gradient(from 0deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b, #ff006e);
+    animation: spin 3s linear infinite;
+}
+
+.border_breathing {
+    background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #06ffa5);
+    animation: breathe 2s ease-in-out infinite alternate;
+}
+
+.border_wave {
+    background: linear-gradient(270deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b);
+    background-size: 400% 400%;
+    animation: wave 4s ease infinite;
+}
+
+.border_electric {
+    background: linear-gradient(45deg, #00f5ff, #ff00ff, #00ff00, #ff0080);
+    animation: electric 1.5s ease-in-out infinite alternate;
+}
+
+.border_rainbow {
+    background: linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080);
+    background-size: 400% 400%;
+    animation: rainbow 6s linear infinite;
+}
+
+/* Keyframes */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes breathe {
+    0% { transform: scale(1); opacity: 0.8; filter: blur(0px); }
+    100% { transform: scale(1.05); opacity: 1; filter: blur(1px); }
+}
+
+@keyframes wave {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes electric {
+    0% { filter: hue-rotate(0deg) brightness(1) saturate(1); transform: scale(1); }
+    50% { filter: hue-rotate(180deg) brightness(1.2) saturate(1.5); transform: scale(1.02); }
+    100% { filter: hue-rotate(360deg) brightness(1) saturate(1); transform: scale(1); }
+}
+
+@keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    25% { background-position: 100% 25%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 75%; }
+    100% { background-position: 0% 50%; }
+}

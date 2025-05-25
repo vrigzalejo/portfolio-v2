@@ -2,6 +2,11 @@
 
 import { ClipPathBorders } from "../components/ClipPathBorders"
 
+import myPic from '@/assets/img/my-pic.jpg';
+import myPicGibly from '@/assets/img/my-pic-gibly.png';
+import HoverImage from "@/components/HoverImage";
+import WaveText from "@/components/WaveText";
+
 export default function AboutSection() {
     const stats = [
         { number: '50+', label: 'Projects', color: 'text-purple-400' },
@@ -15,11 +20,7 @@ export default function AboutSection() {
         <ClipPathBorders>
             <section id="about" className="section-bg">
                 <div className="max-w-6xl mx-auto">
-                    <div className="wave-text text-4xl md:text-5xl pb-1 mb-14 font-bold">
-                        <h2>{title}</h2>
-                        <h2>{title}</h2>
-                    </div>
-
+                    <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="glass-effect p-8 rounded-2xl">
                             <h3 className="text-2xl font-semibold mb-6">Creative Developer</h3>
@@ -49,7 +50,7 @@ export default function AboutSection() {
                             <div className="w-80 h-80 mx-auto bg-gradient-to-br from-purple-600 to-blue-600 rounded-full opacity-20 animate-pulse"></div>
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="w-64 h-64 glass-effect rounded-full flex items-center justify-center">
-                                    <span className="text-6xl">👨‍💻</span>
+                                    <HoverImage primaryImage={myPicGibly} hoverImage={myPic} title={title}/>
                                 </div>
                             </div>
                         </div>

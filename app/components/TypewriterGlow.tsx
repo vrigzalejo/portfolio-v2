@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 type TextsProps = {
     texts: string[];
-    styles?: string;
+    className?: string;
 };
 
-export default function TypewriterGlow({ texts, styles }: TextsProps) {
+export default function TypewriterGlow({ texts, className }: TextsProps) {
     const [currentTextIndex, setCurrentTextIndex] = useState(0);
     const [currentText, setCurrentText] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -41,7 +41,7 @@ export default function TypewriterGlow({ texts, styles }: TextsProps) {
     }, [currentText, isDeleting, isPaused, currentTextIndex, texts]);
 
     return (
-        <div className={`flex items-center justify-center ${styles}`}>
+        <div className={`flex items-center justify-center ${className}`}>
             <div className="text-center">
                 <span className="inline-block text-2xl md:text-3xl lg:text-4xl">
                     {currentText}
