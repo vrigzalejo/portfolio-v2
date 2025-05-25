@@ -284,7 +284,6 @@ export default function ThreeBackground() {
     return (
         <div
             ref={containerRef}
-            id="canvas-container"
             style={{
                 position: 'fixed',
                 top: 0,

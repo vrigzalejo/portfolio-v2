@@ -61,11 +61,6 @@ const HoverImage: React.FC<HoverImageProps> = ({
             <div className="absolute inset-2 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="w-full h-full rounded-full shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]" />
             </div>
-
-            {/* Optional Animation Indicator */}
-            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {clipPathAnimation}
-            </div>
         </div>
     );
 };
