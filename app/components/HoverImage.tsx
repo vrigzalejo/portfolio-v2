@@ -1,65 +1,47 @@
 import Image, { StaticImageData } from "next/image";
-import styles from "./HoverImage.module.css"; // Importing the CSS module
+import styles from "./HoverImage.module.css";
 
 interface HoverImageProps {
     primaryImage: string | StaticImageData;
     hoverImage: string | StaticImageData;
     title: string;
-    borderType?: 'rotating' | 'breathing' | 'wave' | 'electric' | 'rainbow';
+    borderType?: "rotating" | "breathing" | "wave" | "electric" | "rainbow";
 }
 
 const HoverImage: React.FC<HoverImageProps> = ({
     primaryImage,
     hoverImage,
     title,
-    borderType = 'rotating'
+    borderType = "rotating",
 }) => {
-    const getBorderStyles = () => {
-        switch (borderType) {
-            case 'rotating':
-                return styles.border_rotating;
-            case 'breathing':
-                return styles.border_breathing;
-            case 'wave':
-                return styles.border_wave;
-            case 'electric':
-                return styles.border_electric;
-            case 'rainbow':
-                return styles.border_rainbow;
-            default:
-                return styles.border_rotating;
-        }
-    };
-
     return (
-        <div className={`${styles.hover_container} group`}>
+        <div className="relative w-64 h-64 mx-auto group">
             {/* Animated Border */}
-            <div className={`${styles.hover_border} ${getBorderStyles()} ${styles.hover_glow}`}>
-                <div className={styles.hover_borderInner}></div>
+            <div
+                className={`absolute inset-0 rounded-full p-[1px] ${styles[`border_${borderType}`]} ${styles.hover_glow}`}
+            >
+                <div className="w-full h-full rounded-full bg-white/40 dark:bg-black/40" />
             </div>
 
-            {/* Content Container */}
-            <div className={`${styles.hover_content} glass-effect`}>
-                {/* Primary Image */}
+            {/* Image Content */}
+            <div className="absolute inset-2 rounded-full overflow-hidden">
                 <Image
                     src={primaryImage}
                     alt={title}
                     fill
-                    className={`${styles.hover_image} transition-opacity duration-700 ease-in-out`}
+                    className="object-cover z-[1] rounded-full"
                 />
-
-                {/* Hover Image */}
                 <Image
                     src={hoverImage}
                     alt={`${title} hover`}
                     fill
-                    className={`${styles.hover_image} opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out`}
+                    className="object-cover z-[2] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 ease-in-out [clip-path:circle(0%_at_50%_50%)] group-hover:[clip-path:circle(150%_at_50%_50%)]"
                 />
             </div>
 
-            {/* Optional: Inner glow on hover */}
-            <div className={`${styles.hover_innerGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}>
-                <div className={styles.hover_innerGlowContent}></div>
+            {/* Inner Glow */}
+            <div className="absolute inset-2 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="w-full h-full rounded-full shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]" />
             </div>
         </div>
     );
