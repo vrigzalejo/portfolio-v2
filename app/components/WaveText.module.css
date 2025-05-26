@@ -1,3 +1,4 @@
+/* Base styles */
 .waveText {
   position: relative;
   display: flex;
@@ -12,25 +13,46 @@
 .waveText h3 {
   position: absolute;
   text-transform: uppercase;
+  margin: 0;
 }
 
+/* Light mode styles */
 .waveText h1:first-child,
 .waveText h2:first-child,
 .waveText h3:first-child {
   color: transparent;
-  -webkit-text-stroke: 0.02em var(--foreground);
+  -webkit-text-stroke: 0.02em #111827;
 }
 
 .waveText h1:last-child,
 .waveText h2:last-child,
 .waveText h3:last-child {
-  background: var(--foreground);
+  background: linear-gradient(45deg, #111827, #4b5563);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0% 100%);
   animation: waveTextAnimation 2s ease-in-out infinite;
 }
 
+/* Dark mode styles - using html.dark selector */
+:global(html.dark) .waveText h1:first-child,
+:global(html.dark) .waveText h2:first-child,
+:global(html.dark) .waveText h3:first-child {
+  color: transparent;
+  -webkit-text-stroke: 0.02em #f9fafb;
+}
+
+:global(html.dark) .waveText h1:last-child,
+:global(html.dark) .waveText h2:last-child,
+:global(html.dark) .waveText h3:last-child {
+  background: linear-gradient(45deg, #f9fafb, #d1d5db);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Wave animation */
 @keyframes waveTextAnimation {
   0% {
     clip-path: polygon(0% 38%, 21% 40%, 38% 51%, 54% 57%, 75% 57%, 100% 52%, 100% 100%, 0% 100%);

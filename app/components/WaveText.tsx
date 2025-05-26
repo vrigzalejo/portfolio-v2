@@ -7,7 +7,7 @@ interface WaveTextProps {
 
 const WaveText: React.FC<WaveTextProps> = ({ title, className }) => {
     return (
-        <div className={`${styles.waveText} ${className}`}>
+        <div className={`${styles.waveText} ${className || ''}`}>
             <h2>{title}</h2>
             <h2>{title}</h2>
         </div>
