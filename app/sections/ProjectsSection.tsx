@@ -76,6 +76,7 @@ const title = '🚀 Featured Projects'
 export default function ProjectsSection() {
     const [selectedProject, setSelectedProject] = useState<Project | null>(null)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const [imageTransition, setImageTransition] = useState<'none' | 'next' | 'prev'>('none')
 
     const handleViewProject = (project: Project) => {
         if (project.url) {
@@ -89,21 +90,30 @@ export default function ProjectsSection() {
     const closeModal = () => {
         setSelectedProject(null)
         setCurrentImageIndex(0)
+        setImageTransition('none')
     }
 
     const nextImage = () => {
         if (selectedProject?.images) {
-            setCurrentImageIndex((prev) =>
-                prev === selectedProject.images!.length - 1 ? 0 : prev + 1
-            )
+            setImageTransition('next')
+            setTimeout(() => {
+                setCurrentImageIndex((prev) =>
+                    prev === selectedProject.images!.length - 1 ? 0 : prev + 1
+                )
+                setImageTransition('none')
+            }, 150)
         }
     }
 
     const prevImage = () => {
         if (selectedProject?.images) {
-            setCurrentImageIndex((prev) =>
-                prev === 0 ? selectedProject.images!.length - 1 : prev - 1
-            )
+            setImageTransition('prev')
+            setTimeout(() => {
+                setCurrentImageIndex((prev) =>
+                    prev === 0 ? selectedProject.images!.length - 1 : prev - 1
+                )
+                setImageTransition('none')
+            }, 150)
         }
     }
 
@@ -159,7 +169,7 @@ export default function ProjectsSection() {
                     onClick={closeModal}
                 >
                     <div
-                        className="bg-gray-900/90 backdrop-blur-md rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-white/10 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+                        className="bg-gray-900/90 backdrop-blur-md rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden border border-white/10 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
@@ -177,17 +187,24 @@ export default function ProjectsSection() {
                         </div>
 
                         {/* Image Display */}
-                        <div className="relative">
-                            <div className="aspect-video bg-gray-800 flex items-center justify-center">
-                                <Image
-                                    key={currentImageIndex}
-                                    src={selectedProject.images[currentImageIndex]}
-                                    alt={`${selectedProject.title} - Image ${currentImageIndex + 1}`}
-                                    width={800}
-                                    height={450}
-                                    className="max-w-full max-h-full object-contain animate-in fade-in zoom-in-95 duration-300"
-                                    priority
-                                />
+                        <div className="relative overflow-hidden">
+                            <div className="aspect-video bg-gray-800 flex items-center justify-center relative">
+                                <div className={`absolute inset-0 flex items-center justify-center transition-all duration-2000 ease-out ${imageTransition === 'next'
+                                        ? 'transform -translate-x-full opacity-0 scale-95'
+                                        : imageTransition === 'prev'
+                                            ? 'transform translate-x-full opacity-0 scale-95'
+                                            : 'transform translate-x-0 opacity-100 scale-100'
+                                    }`}>
+                                    <Image
+                                        key={`${currentImageIndex}-${imageTransition}`}
+                                        src={selectedProject.images[currentImageIndex]}
+                                        alt={`${selectedProject.title} - Image ${currentImageIndex + 1}`}
+                                        width={800}
+                                        height={450}
+                                        className="max-w-full max-h-full object-contain"
+                                        priority
+                                    />
+                                </div>
                             </div>
 
                             {/* Navigation Arrows */}
@@ -195,13 +212,15 @@ export default function ProjectsSection() {
                                 <>
                                     <button
                                         onClick={prevImage}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-all duration-200 hover:scale-110"
+                                        disabled={imageTransition !== 'none'}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/60 hover:bg-black/80 rounded-full transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm border border-white/10"
                                     >
                                         <ChevronLeft className="w-6 h-6 text-white" />
                                     </button>
                                     <button
                                         onClick={nextImage}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-all duration-200 hover:scale-110"
+                                        disabled={imageTransition !== 'none'}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/60 hover:bg-black/80 rounded-full transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm border border-white/10"
                                     >
                                         <ChevronRight className="w-6 h-6 text-white" />
                                     </button>
@@ -210,8 +229,8 @@ export default function ProjectsSection() {
 
                             {/* Image Counter */}
                             {selectedProject.images.length > 1 && (
-                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-3 py-1 rounded-full animate-in slide-in-from-bottom-2 duration-500">
-                                    <span className="text-white text-sm">
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full animate-in slide-in-from-bottom-2 duration-500 border border-white/10">
+                                    <span className="text-white text-sm font-medium">
                                         {currentImageIndex + 1} / {selectedProject.images.length}
                                     </span>
                                 </div>
@@ -221,7 +240,7 @@ export default function ProjectsSection() {
                         {/* Image Thumbnails */}
                         {selectedProject.images.length > 1 && (
                             <div className="p-4 border-t border-white/10 animate-in slide-in-from-bottom-4 duration-700">
-                                <div className="flex gap-2 overflow-x-auto">
+                                <div className="flex gap-2 overflow-hidden">
                                     {selectedProject.images.map((image, index) => (
                                         <button
                                             key={index}
@@ -244,21 +263,6 @@ export default function ProjectsSection() {
                                 </div>
                             </div>
                         )}
-
-                        {/* Project Tags */}
-                        <div className="p-6 pt-0 animate-in slide-in-from-bottom-4 duration-800">
-                            <div className="flex flex-wrap gap-2">
-                                {selectedProject.tags.map((tag, index) => (
-                                    <span
-                                        key={tag}
-                                        className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600/30'} rounded-full text-sm animate-in fade-in slide-in-from-bottom-2 duration-300`}
-                                        style={{ animationDelay: `${index * 100 + 200}ms` }}
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 </div>
             )}
