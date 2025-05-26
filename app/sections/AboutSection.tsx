@@ -47,10 +47,17 @@ export default function AboutSection() {
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="w-80 h-80 mx-auto bg-gradient-to-br from-purple-600 to-blue-600 rounded-full opacity-20 animate-pulse"></div>
+                            <div className="w-96 h-96 mx-auto bg-gradient-to-br from-purple-600 to-blue-600 rounded-full opacity-20 animate-pulse"></div>
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-64 h-64 glass-effect rounded-full flex items-center justify-center">
-                                    <HoverImage primaryImage={myPicGibly} hoverImage={myPic} title={title} clipPathAnimation="oval" />
+                                <div className="w-96 h-96 glass-effect rounded-full flex items-center justify-center">
+                                    <HoverImage 
+                                        primaryImage={myPicGibly}
+                                        hoverImage={myPic}
+                                        title={title}
+                                        clipPathAnimation="oval" 
+                                        size="2xl" 
+                                        borderType="rotating"
+                                        baseShape="circle" />
                                 </div>
                             </div>
                         </div>

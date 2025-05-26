@@ -1,20 +1,28 @@
 'use client'
 
 import { useState } from 'react'
+import { SiLinkedin, SiGithub } from 'react-icons/si';
 import WaveText from "@/components/WaveText"
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import ContactModal from '@/components/ContactModal'
+import Link from 'next/link';
+import TypewriterGlow from '@/components/TypewriterGlow';
 
 interface ContactMethod {
-    emoji: string
+    icon: JSX.Element;
     title: string
-    info: string
+    url: string
 }
 
 const contactMethods: ContactMethod[] = [
-    { emoji: '💼', title: 'LinkedIn', info: '@brigido-alejo' },
-    { emoji: '🐙', title: 'GitHub', info: '@vrigzalejo' },
+    { icon: <SiLinkedin size={32} />, title: 'LinkedIn', url: 'https://www.linkedin.com/in/brigido-alejo' },
+    { icon: <SiGithub size={32} />, title: 'GitHub', url: 'https://github.com/vrigzalejo' },
 ]
+
+const texts = [
+    "Ready to bring your next project to life?",
+    "Let's create something amazing together.",
+];
 
 const title = '📧 Let\'s Work Together'
 
@@ -27,24 +35,26 @@ export default function ContactSection() {
                 <section id="contact" className="section-bg">
                     <div className="max-w-4xl mx-auto text-center">
                         <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
-                        <p className="text-xl text-gray-300 mb-12">
-                            Ready to bring your next project to life? Let's create something amazing together.
-                        </p>
-                        <div className="grid md:grid-cols-2 gap-8 mb-12">
-                            {contactMethods.map((method, index) => (
-                                <div key={index} className="glass-effect p-6 rounded-2xl">
-                                    <div className="text-3xl mb-4">{method.emoji}</div>
-                                    <h3 className="font-semibold mb-2">{method.title}</h3>
-                                    <p className="text-gray-400">{method.info}</p>
-                                </div>
-                            ))}
+                        
+                        <div className="flex flex-col items-center justify-center">
+                            <TypewriterGlow className="mb-10" textSize="text-xl sm:text-2xl md:text-2xl lg:text-2xl" texts={texts}/>
+                            <div className="grid md:grid-cols-2 gap-8 mb-12">
+                                {contactMethods.map((method, index) => (
+                                    <Link key={index} href={method.url} target="_blank" rel="noopener noreferrer">
+                                        <div key={index} className="glass-effect p-6 rounded-2xl flex flex-col items-center justify-center">
+                                            <div className="text-3xl mb-4">{method.icon}</div>
+                                            <h3 className="font-semibold mb-2">{method.title}</h3>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="px-12 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105"
+                            >
+                                Get In Touch
+                            </button>
                         </div>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="px-12 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105"
-                        >
-                            Get In Touch
-                        </button>
                     </div>
                 </section>
             </ClipPathBorders>

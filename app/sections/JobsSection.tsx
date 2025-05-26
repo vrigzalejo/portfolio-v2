@@ -4,7 +4,7 @@ import WaveText from "@/components/WaveText";
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import Timeline from '@/components/Timeline';
 
-export default function WorkSection() {
+export default function JobsSection() {
     const experiences = [
         { date: "2025", title: "Senior Developer", company: "Tech Corp", description: "Leading the development team and mentoring junior engineers." },
         { date: "2023", title: "Frontend Engineer", company: "Creative Designs", description: "Worked on UI/UX improvements using React and TailwindCSS." },
@@ -14,11 +14,11 @@ export default function WorkSection() {
     ];
 
 
-    const title = '👤 Work Experiences'
+    const title = '👤 Job Experiences'
 
     return (
         <ClipPathBorders>
-            <section id="work" className="section-bg">
+            <section id="jobs" className="section-bg">
                 <div className="max-w-6xl mx-auto">
                     <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
                     <Timeline experiences={experiences} />

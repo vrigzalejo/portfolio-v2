@@ -1,5 +1,8 @@
 import WaveText from "@/components/WaveText"
 import { ClipPathBorders } from "../components/ClipPathBorders"
+import HoverImage from "@/components/HoverImage"
+import myPic from '@/assets/img/my-pic.jpg';
+import myPicGibly from '@/assets/img/my-pic-gibly.png';
 
 interface Project {
     id: number
@@ -60,8 +63,15 @@ export default function ProjectsSection() {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {projects.map((project) => (
                             <div key={project.id} className="project-card glass-effect p-6 rounded-2xl">
-                                <div className={`h-48 bg-gradient-to-br ${project.gradient} rounded-xl mb-6 flex items-center justify-center`}>
-                                    <span className="text-4xl">{project.emoji}</span>
+                                <div className="mb-6">
+                                    <HoverImage
+                                        primaryImage={myPicGibly}
+                                        hoverImage={myPic}
+                                        title={title}
+                                        clipPathAnimation="oval"
+                                        size="xl"
+                                        baseShape="square"
+                                        borderType="wave" />
                                 </div>
                                 <h3 className="text-xl font-semibold mb-3">{project.title}</h3>
                                 <p className="text-gray-400 mb-4">{project.description}</p>

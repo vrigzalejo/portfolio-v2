@@ -5,7 +5,7 @@ import ProjectsSection from '@/sections/ProjectsSection'
 import SkillsSection from '@/sections/SkillsSection'
 import ContactSection from '@/sections/ContactSection'
 import ThreeBackground from './components/ThreeBackground'
-import WorkSection from './sections/WorkSection'
+import WorkSection from './sections/JobsSection'
 
 export default function Home() {
   return (

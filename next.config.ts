@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  images: {
+    domains: [
+      'www.gravatar.com'
+    ],
+  },
 };
 
 export default nextConfig;
