@@ -41,7 +41,7 @@ export default function ContactSection() {
                             <div className="grid md:grid-cols-2 gap-8 mb-12">
                                 {contactMethods.map((method, index) => (
                                     <Link key={index} href={method.url} target="_blank" rel="noopener noreferrer">
-                                        <div key={index} className="glass-effect p-6 rounded-2xl flex flex-col items-center justify-center">
+                                        <div key={index} className="glass-effect shadow-lg text-gray-900 dark:text-white p-6 rounded-2xl flex flex-col items-center justify-center">
                                             <div className="text-3xl mb-4">{method.icon}</div>
                                             <h3 className="font-semibold mb-2">{method.title}</h3>
                                         </div>

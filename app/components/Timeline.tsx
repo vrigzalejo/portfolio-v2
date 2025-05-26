@@ -32,7 +32,7 @@ export default function Timeline({ experiences }: TimelineProps) {
                     viewport={{ once: true }}
                 >
                     {/* Timeline Dot */}
-                    <span className="absolute -left-11.75 top-1/2 transform -translate-y-1/2 w-4 h-4 glass-effect rounded-full shadow-md"></span>
+                    <span className="absolute -left-11.75 top-1/2 transform -translate-y-1/2 w-4 h-4 glass-effect rounded-full bg-gray-900"></span>
 
                     {/* Experience Card */}
                     <div className="glass-effect dark:bg-gray-800 p-6 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">

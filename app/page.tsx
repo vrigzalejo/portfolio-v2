@@ -20,7 +20,7 @@ export default function Home() {
         <SkillsSection />
         <ContactSection />
       </main>
-      <footer className="py-8 px-4 border-t border-gray-800 glass-effect ">
+      <footer className="py-8 px-4 border-t border-gray-800 glass-effect shadow-[0px_10px_30px_rgba(0,0,0,0.3)]">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-gray-400">© {new Date().getFullYear()} Brigido Alejo</p>
         </div>

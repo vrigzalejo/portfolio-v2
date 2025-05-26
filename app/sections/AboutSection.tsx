@@ -22,14 +22,14 @@ export default function AboutSection() {
                 <div className="max-w-6xl mx-auto">
                     <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
                     <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div className="glass-effect p-8 rounded-2xl">
-                            <h3 className="text-2xl font-semibold mb-6">Creative Developer</h3>
-                            <p className="text-gray-300 mb-6 leading-relaxed">
+                        <div className="glass-effect dark:bg-gray-800 shadow-lg p-8 rounded-2xl">
+                            <h3 className="text-gray-900 dark:text-white text-2xl font-semibold mb-6">Creative Developer</h3>
+                            <p className="text-gray-900 dark:text-white mb-6 leading-relaxed">
                                 I'm a passionate full-stack developer with 5+ years of experience creating immersive digital experiences.
                                 I specialize in combining cutting-edge web technologies with 3D graphics to build applications that push
                                 the boundaries of what's possible on the web.
                             </p>
-                            <p className="text-gray-300 leading-relaxed mb-8">
+                            <p className="text-gray-900 dark:text-white leading-relaxed mb-8">
                                 When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects,
                                 or experimenting with 3D art and animation.
                             </p>
@@ -39,7 +39,7 @@ export default function AboutSection() {
                                         <div className={`text-3xl font-bold ${stat.color}`}>
                                             {stat.number}
                                         </div>
-                                        <div className="text-sm text-gray-400">
+                                        <div className="text-sm text-gray-700 dark:text-gray-300">
                                             {stat.label}
                                         </div>
                                     </div>

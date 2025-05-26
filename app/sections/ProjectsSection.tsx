@@ -60,15 +60,15 @@ const projects: Project[] = [
 ]
 
 const tagColors: { [key: string]: string } = {
-    'React': 'bg-purple-600/30',
-    'Three.js': 'bg-blue-600/30',
-    'WebGL': 'bg-green-600/30',
-    'TypeScript': 'bg-purple-600/30',
-    'Canvas API': 'bg-blue-600/30',
-    'Physics': 'bg-red-600/30',
-    'Vue.js': 'bg-purple-600/30',
-    'D3.js': 'bg-blue-600/30',
-    'WebSockets': 'bg-yellow-600/30'
+    'React': 'bg-purple-600/80',
+    'Three.js': 'bg-blue-600/80',
+    'WebGL': 'bg-green-600/80',
+    'TypeScript': 'bg-purple-600/80',
+    'Canvas API': 'bg-blue-600/80',
+    'Physics': 'bg-red-600/80',
+    'Vue.js': 'bg-purple-600/80',
+    'D3.js': 'bg-blue-600/80',
+    'WebSockets': 'bg-yellow-600/80'
 }
 
 const title = '🚀 Featured Projects'
@@ -125,7 +125,7 @@ export default function ProjectsSection() {
                         <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {projects.map((project) => (
-                                <div key={project.id} className="project-card glass-effect p-6 rounded-2xl">
+                                <div key={project.id} className="project-card glass-effect p-6 rounded-2xl shadow-lg">
                                     <div className="mb-6">
                                         <HoverImage
                                             primaryImage={myPicGibly}
@@ -136,8 +136,8 @@ export default function ProjectsSection() {
                                             baseShape="square"
                                             borderType="wave" />
                                     </div>
-                                    <h3 className="text-xl font-semibold mb-3">{project.title}</h3>
-                                    <p className="text-gray-400 mb-4">{project.description}</p>
+                                    <h3 className="text-gray-900 dark:text-white text-xl font-semibold mb-3">{project.title}</h3>
+                                    <p className="text-gray-500 dark:text-gray-200 mb-4">{project.description}</p>
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {project.tags.map((tag) => (
                                             <span
@@ -150,7 +150,7 @@ export default function ProjectsSection() {
                                     </div>
                                     <button
                                         onClick={() => handleViewProject(project)}
-                                        className="w-full py-2 glass-effect rounded-lg hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+                                        className="shadow-lg font-bold w-full py-2 rounded-lg text-gray-700 dark:text-white dark:bg-gray-300/30 hover:dark:bg-gray-300/60 bg-gray-600/10 hover:bg-gray-300/10 transition-all flex items-center justify-center gap-2"
                                     >
                                         View Project
                                         {project.url && <ExternalLink className="w-4 h-4" />}
