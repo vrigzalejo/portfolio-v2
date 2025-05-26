@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import ThemeToggle from './ThemeToggle'
-import Image from 'next/image'
 import Link from 'next/link'
 import styles from './Navigation.module.css'
 import myPic from '@/assets/img/my-pic.jpg';
@@ -44,7 +43,8 @@ export default function Navigation() {
   }
 
   return (
-    <nav className={`fixed top-0 w-full z-50 ${styles.glassNav} ${scrolled ? styles.scrolled : ''}`}>
+    <nav className={`fixed top-0 w-full z-50 backdrop-blur-lg transition-all border-b 
+      ${scrolled ? 'shadow-lg' : 'shadow-lg dark:bg-gray-900/80'} ${styles.glassNav} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.floatingOrb} style={{ top: '-50px', right: '10%' }}></div>
       <div className={styles.floatingOrb} style={{ top: '-75px', left: '20%', animationDelay: '2s' }}></div>
 
@@ -73,7 +73,7 @@ export default function Navigation() {
                 onClick={() => handleNavClick(item.href)}
                 className={`${styles.navItem} px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${activeSection === item.href
                     ? styles.activeItem
-                    : 'text-slate-300 hover:text-purple-400'
+                    : 'dark:text-slate-300 text-slate-900 hover:text-purple-400'
                   }`}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -88,7 +88,7 @@ export default function Navigation() {
             className="md:hidden"
             aria-label="Toggle mobile menu"
           >
-            <div className={`${styles.hamburger} ${isMobileMenuOpen ? 'open' : ''}`}>
+            <div className={`${styles.hamburger} ${isMobileMenuOpen ? styles.open : ''}`}>
               <span></span>
               <span></span>
               <span></span>
@@ -98,7 +98,7 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className={`md:hidden ${styles.mobileMenu}`}>
+          <div className={`md:hidden ${styles.mobileMenu} ${styles.slideDown}`}>
             <div className="px-4 py-6 space-y-1">
               {navItems.map((item) => (
                 <button
@@ -106,7 +106,7 @@ export default function Navigation() {
                   onClick={() => handleNavClick(item.href)}
                   className={`${styles.mobileNavItem} w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-3 ${activeSection === item.href
                       ? 'text-purple-400 bg-purple-500/10 border-l-purple-400'
-                      : 'text-slate-300 hover:text-purple-400'
+                    : 'dark:text-slate-300 text-slate-900  hover:text-purple-400'
                     }`}
                 >
                   <span className="text-xl">{item.icon}</span>

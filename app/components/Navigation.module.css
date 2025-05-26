@@ -1,13 +1,11 @@
 .glassNav {
   backdrop-filter: blur(20px);
-  background: rgba(15, 23, 42, 0.8);
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glassNav.scrolled {
   backdrop-filter: blur(25px);
-  background: rgba(15, 23, 42, 0.95);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
@@ -78,9 +76,7 @@
 
 .mobileMenu {
   backdrop-filter: blur(20px);
-  background: rgba(15, 23, 42, 0.95);
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
-  animation: slideDown 0.3s ease-out;
+  transition: all 0.3s ease-in-out;
 }
 
 @keyframes slideDown {
@@ -92,6 +88,10 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.slideDown {
+  animation: slideDown 0.3s ease-in-out;
 }
 
 .mobileNavItem {
