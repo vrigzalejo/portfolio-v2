@@ -34,8 +34,6 @@ export default function SkillsSection() {
     const sceneRef = useRef(null)
     const rendererRef = useRef(null)
     const frameRef = useRef(null)
-    const [hoveredSkill, setHoveredSkill] = useState(null)
-    const [isSceneReady, setIsSceneReady] = useState(false)
 
     // Create skill spheres data
     const skillSpheres = useMemo(() => {
@@ -87,26 +85,14 @@ export default function SkillsSection() {
         })
         renderer.setSize(window.innerWidth, window.innerHeight)
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-        renderer.shadowMap.enabled = true
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap
         mountRef.current.appendChild(renderer.domElement)
 
-        // Enhanced Lighting for better shadows
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
+        // Basic Lighting (shadows removed)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
         scene.add(ambientLight)
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
         directionalLight.position.set(10, 10, 5)
-        directionalLight.castShadow = true
-        directionalLight.shadow.mapSize.width = 4096
-        directionalLight.shadow.mapSize.height = 4096
-        directionalLight.shadow.camera.near = 0.1
-        directionalLight.shadow.camera.far = 50
-        directionalLight.shadow.camera.left = -20
-        directionalLight.shadow.camera.right = 20
-        directionalLight.shadow.camera.top = 20
-        directionalLight.shadow.camera.bottom = -20
-        directionalLight.shadow.bias = -0.0001
         scene.add(directionalLight)
 
         // Add additional lights for better 3D effect
@@ -118,26 +104,12 @@ export default function SkillsSection() {
         rimLight.position.set(0, 0, -10)
         scene.add(rimLight)
 
-        // Create invisible ground plane for shadows
-        const groundGeometry = new THREE.PlaneGeometry(50, 50)
-        const groundMaterial = new THREE.MeshLambertMaterial({
-            color: 0x000000,
-            transparent: true,
-            opacity: 0
-        })
-        const groundPlane = new THREE.Mesh(groundGeometry, groundMaterial)
-        groundPlane.rotation.x = -Math.PI / 2
-        groundPlane.position.y = -8
-        groundPlane.receiveShadow = true
-        scene.add(groundPlane)
-
         // Create 3D text skills
         const textMeshes = []
-        const shadowMeshes = []
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
 
-        // Create floating 3D text with enhanced shadows
+        // Create floating 3D text
         const createTextMesh = (text, skillData, index) => {
             // Validate skillData
             if (!skillData || !skillData.position) {
@@ -195,8 +167,6 @@ export default function SkillsSection() {
             })
 
             const sprite = new THREE.Sprite(spriteMaterial)
-            sprite.castShadow = true
-            sprite.receiveShadow = true
 
             // Scale based on text length
             const textMetrics = context.measureText(text)
@@ -225,44 +195,8 @@ export default function SkillsSection() {
                 isHovered: false
             }
 
-            // Create 3D shadow plane beneath each text
-            const shadowCanvas = document.createElement('canvas')
-            const shadowContext = shadowCanvas.getContext('2d')
-            shadowCanvas.width = 512
-            shadowCanvas.height = 128
-
-            // Create shadow text
-            shadowContext.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height)
-            shadowContext.font = 'bold 10em Arial, sans-serif'
-            shadowContext.textAlign = 'center'
-            shadowContext.textBaseline = 'middle'
-            shadowContext.fillStyle = 'rgba(0, 0, 0, 0.3)'
-            shadowContext.fillText(text, shadowCanvas.width / 2, shadowCanvas.height / 2)
-
-            const shadowTexture = new THREE.CanvasTexture(shadowCanvas)
-            const shadowMaterial = new THREE.SpriteMaterial({
-                map: shadowTexture,
-                transparent: true,
-                opacity: 0.3,
-                alphaTest: 0.1
-            })
-
-            const shadowSprite = new THREE.Sprite(shadowMaterial)
-            shadowSprite.scale.copy(sprite.scale)
-            shadowSprite.position.set(
-                sprite.position.x + 0.5,
-                sprite.position.y - 1.5,
-                sprite.position.z + 0.5
-            )
-            shadowSprite.userData = {
-                parentSprite: sprite,
-                originalOpacity: 0.3
-            }
-
             scene.add(sprite)
-            scene.add(shadowSprite)
             textMeshes.push(sprite)
-            shadowMeshes.push(shadowSprite)
         }
 
         // Create text meshes for each skill
@@ -295,11 +229,9 @@ export default function SkillsSection() {
                     intersectedSprite.userData.targetScale.copy(intersectedSprite.userData.originalScale)
                     intersectedSprite.userData.targetScale.multiplyScalar(1.5)
                     intersectedSprite.userData.targetOpacity = 1.2
-                    setHoveredSkill(intersectedSprite.userData.skill)
                 }
                 document.body.style.cursor = 'pointer'
             } else {
-                setHoveredSkill(null)
                 document.body.style.cursor = 'default'
             }
         }
@@ -369,19 +301,6 @@ export default function SkillsSection() {
                 // Enhanced rotation with hover effect
                 const rotationSpeed = sprite.userData.isHovered ? 0.002 : 0.0005
                 sprite.rotation.y = Math.sin(Date.now() * rotationSpeed + index) * 0.3
-
-                // Update shadow position and opacity
-                const shadowSprite = shadowMeshes[index]
-                if (shadowSprite && shadowSprite.userData) {
-                    shadowSprite.position.x = sprite.position.x + 0.5
-                    shadowSprite.position.y = sprite.position.y - 2
-                    shadowSprite.position.z = sprite.position.z + 0.5
-                    shadowSprite.scale.copy(sprite.scale)
-
-                    // Shadow fades when hovering
-                    const targetShadowOpacity = sprite.userData.isHovered ? 0.1 : 0.3
-                    shadowSprite.material.opacity += (targetShadowOpacity - shadowSprite.material.opacity) * 0.1
-                }
             })
 
             // Dynamic camera rotation
@@ -409,7 +328,6 @@ export default function SkillsSection() {
 
         // Start animation
         animate()
-        setIsSceneReady(true)
 
         // Cleanup
         return () => {
