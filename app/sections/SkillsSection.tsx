@@ -91,23 +91,53 @@ export default function SkillsSection() {
         renderer.shadowMap.type = THREE.PCFSoftShadowMap
         mountRef.current.appendChild(renderer.domElement)
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
+        // Enhanced Lighting for better shadows
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
         scene.add(ambientLight)
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0)
         directionalLight.position.set(10, 10, 5)
         directionalLight.castShadow = true
-        directionalLight.shadow.mapSize.width = 2048
-        directionalLight.shadow.mapSize.height = 2048
+        directionalLight.shadow.mapSize.width = 4096
+        directionalLight.shadow.mapSize.height = 4096
+        directionalLight.shadow.camera.near = 0.1
+        directionalLight.shadow.camera.far = 50
+        directionalLight.shadow.camera.left = -20
+        directionalLight.shadow.camera.right = 20
+        directionalLight.shadow.camera.top = 20
+        directionalLight.shadow.camera.bottom = -20
+        directionalLight.shadow.bias = -0.0001
         scene.add(directionalLight)
+
+        // Add additional lights for better 3D effect
+        const fillLight = new THREE.DirectionalLight(0x4169e1, 0.3)
+        fillLight.position.set(-10, -5, -5)
+        scene.add(fillLight)
+
+        const rimLight = new THREE.DirectionalLight(0xff6b6b, 0.2)
+        rimLight.position.set(0, 0, -10)
+        scene.add(rimLight)
+
+        // Create invisible ground plane for shadows
+        const groundGeometry = new THREE.PlaneGeometry(50, 50)
+        const groundMaterial = new THREE.MeshLambertMaterial({
+            color: 0x000000,
+            transparent: true,
+            opacity: 0
+        })
+        const groundPlane = new THREE.Mesh(groundGeometry, groundMaterial)
+        groundPlane.rotation.x = -Math.PI / 2
+        groundPlane.position.y = -8
+        groundPlane.receiveShadow = true
+        scene.add(groundPlane)
 
         // Create 3D text skills
         const textMeshes = []
+        const shadowMeshes = []
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
 
-        // Create floating 3D text without background shapes
+        // Create floating 3D text with enhanced shadows
         const createTextMesh = (text, skillData, index) => {
             // Validate skillData
             if (!skillData || !skillData.position) {
@@ -129,24 +159,28 @@ export default function SkillsSection() {
             context.textAlign = 'center'
             context.textBaseline = 'middle'
 
-            // Create text with glow effect
+            // Create text with enhanced glow effect
             context.shadowColor = skillData.color || '#ffffff'
-            context.shadowBlur = 0
             context.shadowOffsetX = 0
             context.shadowOffsetY = 0
 
             // Draw multiple glow layers for stronger effect
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 5; i++) {
                 context.strokeStyle = skillData.color || '#ffffff'
-                context.lineWidth = 8 - i * 2
+                context.lineWidth = 12 - i * 2
                 context.strokeText(text, canvas.width / 2, canvas.height / 2)
             }
 
-            // Draw main text
-            context.shadowBlur = 0
+            // Draw main text with gradient effect
+            const gradient = context.createLinearGradient(0, 0, 0, canvas.height)
+            gradient.addColorStop(0, skillData.color)
+            gradient.addColorStop(1, `${skillData.color}80`)
+            context.fillStyle = gradient
+            context.fillText(text, canvas.width / 2, canvas.height / 2)
 
             // Add text outline for definition
-            context.lineWidth = 2
+            context.strokeStyle = '#ffffff'
+            context.lineWidth = 3
             context.strokeText(text, canvas.width / 2, canvas.height / 2)
 
             // Create texture from canvas
@@ -161,6 +195,8 @@ export default function SkillsSection() {
             })
 
             const sprite = new THREE.Sprite(spriteMaterial)
+            sprite.castShadow = true
+            sprite.receiveShadow = true
 
             // Scale based on text length
             const textMetrics = context.measureText(text)
@@ -174,31 +210,59 @@ export default function SkillsSection() {
                 skillData.position.z || 0
             )
 
-            // Store original scale before setting userData
+            // Store original scale and create animation properties
             const originalScale = sprite.scale.clone()
 
             sprite.userData = {
                 skill: skillData,
                 index,
                 originalY: skillData.position.y || 0,
-                originalScale: originalScale // Now this is properly defined
+                originalScale: originalScale,
+                targetScale: originalScale.clone(),
+                currentScale: originalScale.clone(),
+                targetOpacity: 1,
+                currentOpacity: 1,
+                isHovered: false
             }
 
-            // Add particle effects around text
-            const particleCount = 20
-            const particleGeometry = new THREE.BufferGeometry()
-            const particlePositions = new Float32Array(particleCount * 3)
+            // Create 3D shadow plane beneath each text
+            const shadowCanvas = document.createElement('canvas')
+            const shadowContext = shadowCanvas.getContext('2d')
+            shadowCanvas.width = 512
+            shadowCanvas.height = 128
 
-            for (let i = 0; i < particleCount; i++) {
-                particlePositions[i * 3] = (Math.random() - 0.5) * 3
-                particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 2
-                particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 2
+            // Create shadow text
+            shadowContext.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height)
+            shadowContext.font = 'bold 10em Arial, sans-serif'
+            shadowContext.textAlign = 'center'
+            shadowContext.textBaseline = 'middle'
+            shadowContext.fillStyle = 'rgba(0, 0, 0, 0.3)'
+            shadowContext.fillText(text, shadowCanvas.width / 2, shadowCanvas.height / 2)
+
+            const shadowTexture = new THREE.CanvasTexture(shadowCanvas)
+            const shadowMaterial = new THREE.SpriteMaterial({
+                map: shadowTexture,
+                transparent: true,
+                opacity: 0.3,
+                alphaTest: 0.1
+            })
+
+            const shadowSprite = new THREE.Sprite(shadowMaterial)
+            shadowSprite.scale.copy(sprite.scale)
+            shadowSprite.position.set(
+                sprite.position.x + 0.5,
+                sprite.position.y - 1.5,
+                sprite.position.z + 0.5
+            )
+            shadowSprite.userData = {
+                parentSprite: sprite,
+                originalOpacity: 0.3
             }
-
-            particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3))
 
             scene.add(sprite)
+            scene.add(shadowSprite)
             textMeshes.push(sprite)
+            shadowMeshes.push(shadowSprite)
         }
 
         // Create text meshes for each skill
@@ -206,7 +270,7 @@ export default function SkillsSection() {
             createTextMesh(skillData.name, skillData, index)
         })
 
-        // Mouse interaction
+        // Enhanced mouse interaction with smooth transitions
         const handleMouseMove = (event) => {
             const rect = renderer.domElement.getBoundingClientRect()
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
@@ -215,21 +279,22 @@ export default function SkillsSection() {
             raycaster.setFromCamera(mouse, camera)
             const intersects = raycaster.intersectObjects(textMeshes)
 
-            // Reset all text sprites
+            // Reset all hover states
             textMeshes.forEach(sprite => {
-                if (sprite.userData && sprite.userData.originalScale) {
-                    sprite.scale.copy(sprite.userData.originalScale)
-                    sprite.material.opacity = 1
+                if (sprite.userData) {
+                    sprite.userData.isHovered = false
+                    sprite.userData.targetScale.copy(sprite.userData.originalScale)
+                    sprite.userData.targetOpacity = 1
                 }
             })
 
             if (intersects.length > 0) {
                 const intersectedSprite = intersects[0].object
-                // Scale up and make more opaque on hover
-                if (intersectedSprite.userData && intersectedSprite.userData.originalScale) {
-                    intersectedSprite.scale.copy(intersectedSprite.userData.originalScale)
-                    intersectedSprite.scale.multiplyScalar(1.4)
-                    intersectedSprite.material.opacity = 1.2
+                if (intersectedSprite.userData) {
+                    intersectedSprite.userData.isHovered = true
+                    intersectedSprite.userData.targetScale.copy(intersectedSprite.userData.originalScale)
+                    intersectedSprite.userData.targetScale.multiplyScalar(1.5)
+                    intersectedSprite.userData.targetOpacity = 1.2
                     setHoveredSkill(intersectedSprite.userData.skill)
                 }
                 document.body.style.cursor = 'pointer'
@@ -249,17 +314,24 @@ export default function SkillsSection() {
 
             if (intersects.length > 0) {
                 const sprite = intersects[0].object
-                // Add click animation - pulse effect
+                // Enhanced click animation with elastic effect
                 if (sprite.userData && sprite.userData.originalScale) {
                     const originalScale = sprite.userData.originalScale.clone()
-                    sprite.scale.copy(originalScale)
-                    sprite.scale.multiplyScalar(0.7)
+
+                    // Immediate scale down
+                    sprite.userData.targetScale.copy(originalScale)
+                    sprite.userData.targetScale.multiplyScalar(0.6)
+
                     setTimeout(() => {
-                        sprite.scale.copy(originalScale)
-                        sprite.scale.multiplyScalar(1.6)
+                        // Scale up beyond target
+                        sprite.userData.targetScale.copy(originalScale)
+                        sprite.userData.targetScale.multiplyScalar(1.8)
+
                         setTimeout(() => {
-                            sprite.scale.copy(originalScale)
-                        }, 200)
+                            // Return to hover state
+                            sprite.userData.targetScale.copy(originalScale)
+                            sprite.userData.targetScale.multiplyScalar(1.5)
+                        }, 150)
                     }, 100)
                 }
             }
@@ -268,39 +340,51 @@ export default function SkillsSection() {
         renderer.domElement.addEventListener('mousemove', handleMouseMove)
         renderer.domElement.addEventListener('click', handleClick)
 
-        // Animation loop
+        // Animation loop with smooth transitions
         const animate = () => {
             frameRef.current = requestAnimationFrame(animate)
 
-            // Animate text sprites
+            // Animate text sprites with smooth transitions
             textMeshes.forEach((sprite, index) => {
                 const skillData = skillSpheres[index]
 
                 // Safety check
-                if (!skillData || !skillData.position) return
+                if (!skillData || !skillData.position || !sprite.userData) return
+
+                // Smooth scale transition
+                const lerpFactor = 0.1
+                sprite.userData.currentScale.lerp(sprite.userData.targetScale, lerpFactor)
+                sprite.scale.copy(sprite.userData.currentScale)
+
+                // Smooth opacity transition
+                sprite.userData.currentOpacity += (sprite.userData.targetOpacity - sprite.userData.currentOpacity) * lerpFactor
+                sprite.material.opacity = Math.min(1, sprite.userData.currentOpacity)
 
                 // Floating animation
-                sprite.position.y = skillData.position.y + Math.sin(Date.now() * 0.001 + index) * 0.4
+                const baseY = skillData.position.y
+                const floatOffset = Math.sin(Date.now() * 0.001 + index) * 0.4
+                const hoverOffset = sprite.userData.isHovered ? 0.3 : 0
+                sprite.position.y = baseY + floatOffset + hoverOffset
 
-                // Gentle rotation around Y axis for 3D effect
-                sprite.rotation.y = Math.sin(Date.now() * 0.0005 + index) * 0.2
+                // Enhanced rotation with hover effect
+                const rotationSpeed = sprite.userData.isHovered ? 0.002 : 0.0005
+                sprite.rotation.y = Math.sin(Date.now() * rotationSpeed + index) * 0.3
 
-                // Animate particles
-                if (sprite.children[0]) {
-                    const particles = sprite.children[0]
-                    particles.rotation.y += 0.01
-                    particles.rotation.x += 0.005
+                // Update shadow position and opacity
+                const shadowSprite = shadowMeshes[index]
+                if (shadowSprite && shadowSprite.userData) {
+                    shadowSprite.position.x = sprite.position.x + 0.5
+                    shadowSprite.position.y = sprite.position.y - 2
+                    shadowSprite.position.z = sprite.position.z + 0.5
+                    shadowSprite.scale.copy(sprite.scale)
 
-                    // Update particle positions for floating effect
-                    const positions = particles.geometry.attributes.position.array
-                    for (let i = 0; i < positions.length; i += 3) {
-                        positions[i + 1] += Math.sin(Date.now() * 0.002 + i) * 0.002
-                    }
-                    particles.geometry.attributes.position.needsUpdate = true
+                    // Shadow fades when hovering
+                    const targetShadowOpacity = sprite.userData.isHovered ? 0.1 : 0.3
+                    shadowSprite.material.opacity += (targetShadowOpacity - shadowSprite.material.opacity) * 0.1
                 }
             })
 
-            // Rotate camera around the scene
+            // Dynamic camera rotation
             const time = Date.now() * 0.0003
             camera.position.x = Math.cos(time) * 10
             camera.position.z = Math.sin(time) * 10
@@ -368,7 +452,7 @@ export default function SkillsSection() {
                     {/* Title positioned absolutely at the top */}
                     <WaveText
                         title={title}
-                        className="text-4xl md:text-5xl pb-1 mb-14 font-bold"
+                        className="text-4xl md:text-5xl font-bold"
                     />
 
                     <div className="flex justify-center items-center">
