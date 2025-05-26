@@ -7,23 +7,50 @@ interface ContactFormData {
     email: string
     subject: string
     message: string
+    recaptchaToken: string
 }
 
 export async function POST(request: Request) {
     try {
-        const { name, email, subject, message }: ContactFormData = await request.json()
+        console.log('Received POST request')
+        const { name, email, subject, message, recaptchaToken }: ContactFormData = await request.json()
+        console.log('Parsed form data:', { name, email, subject, message, recaptchaToken })
 
         // Validate required fields
-        if (!name || !email || !subject || !message) {
+        if (!name || !email || !subject || !message || !recaptchaToken) {
+            console.warn('Missing required fields')
             return NextResponse.json(
-                { error: 'All fields are required' },
+                { error: 'All fields including reCAPTCHA are required' },
                 { status: 400 }
+            )
+        }
+
+        // Verify reCAPTCHA token with Google
+        console.log('Verifying reCAPTCHA token...')
+        const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY
+        const recaptchaRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `secret=${recaptchaSecret}&response=${recaptchaToken}`
+        })
+
+        const recaptchaData = await recaptchaRes.json()
+        console.log('reCAPTCHA response:', recaptchaData)
+
+        if (!recaptchaData.success || recaptchaData.score < 0.5) {
+            console.warn('Failed reCAPTCHA verification')
+            return NextResponse.json(
+                { error: 'Failed reCAPTCHA verification' },
+                { status: 403 }
             )
         }
 
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
+            console.warn('Invalid email format')
             return NextResponse.json(
                 { error: 'Invalid email format' },
                 { status: 400 }
@@ -31,6 +58,7 @@ export async function POST(request: Request) {
         }
 
         // Create transporter (configure with your email service)
+        console.log('Setting up mail transporter...')
         const transporter = nodemailer.createTransport({
             // For Gmail
             service: 'gmail',
@@ -52,10 +80,10 @@ export async function POST(request: Request) {
         const mailOptions = {
             from: `"${name}" <${process.env.EMAIL_USER}>`,
             to: process.env.EMAIL_TO || process.env.EMAIL_USER, // Your email where you want to receive messages
-            subject: `Portfolio Contact: ${subject}`,
+            subject: `Portfolio v2 Contact: ${subject}`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #333; border-bottom: 2px solid #6366f1; padding-bottom: 10px;">
+                    <h2 style="color: #444; border-bottom: 2px solid #6366f1; padding-bottom: 10px;">
                         New Contact Form Submission
                     </h2>
                     
@@ -66,14 +94,14 @@ export async function POST(request: Request) {
                     </div>
                     
                     <div style="margin: 20px 0;">
-                        <h3 style="color: #333; margin-bottom: 10px;">Message:</h3>
+                        <h3 style="color: #444; margin-bottom: 10px;">Message:</h3>
                         <div style="background-color: #fff; padding: 15px; border-left: 4px solid #6366f1; border-radius: 4px;">
                             ${message.replace(/\n/g, '<br>')}
                         </div>
                     </div>
                     
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px;">
-                        <p>This email was sent from your portfolio contact form.</p>
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #777; font-size: 12px;">
+                        <p>This email was sent from your Portfolio v2 contact form.</p>
                         <p>Reply directly to this email to respond to ${name}.</p>
                     </div>
                 </div>
@@ -89,14 +117,16 @@ export async function POST(request: Request) {
                 ${message}
                 
                 ---
-                This email was sent from your portfolio contact form.
+                This email was sent from your Portfolio v2 contact form.
                 Reply directly to this email to respond to ${name}.
             `,
             replyTo: email, // This allows you to reply directly to the sender
         }
 
         // Send email
+        console.log('Sending email...')
         await transporter.sendMail(mailOptions)
+        console.log('Email sent successfully')
 
         return NextResponse.json(
             { message: 'Email sent successfully' },
