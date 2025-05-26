@@ -13,7 +13,15 @@ type TimelineProps = {
 
 export default function Timeline({ experiences }: TimelineProps) {
     return (
-        <div className="relative border-l-2 border-gray-600 dark:border-gray-600 pl-6">
+        <div className="relative pl-6">
+            {/* Animated Vertical Line */}
+            <motion.div
+                className="absolute left-0 top-0 w-1 bg-gray-600 dark:bg-gray-600"
+                initial={{ height: 0 }}
+                animate={{ height: "100%" }}
+                transition={{ duration: experiences.length * 0.4, ease: "easeInOut" }}
+            />
+
             {experiences.map((exp, index) => (
                 <motion.div
                     key={index}
@@ -24,8 +32,8 @@ export default function Timeline({ experiences }: TimelineProps) {
                     viewport={{ once: true }}
                 >
                     {/* Timeline Dot */}
-                    <span className="absolute -left-12.25 top-1/2 transform -translate-y-1/2 w-4 h-4 glass-effect rounded-full shadow-md"></span>
-                    
+                    <span className="absolute -left-11.75 top-1/2 transform -translate-y-1/2 w-4 h-4 glass-effect rounded-full shadow-md"></span>
+
                     {/* Experience Card */}
                     <div className="glass-effect dark:bg-gray-800 p-6 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">

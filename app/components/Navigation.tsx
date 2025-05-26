@@ -220,7 +220,6 @@ export default function Navigation() {
                     <div className="flex justify-between items-center py-4">
                         <div className="flex items-center space-x-4">
                             <div className="text-3xl font-bold logo">BA</div>
-                            <ThemeToggle />
                         </div>
 
                         {/* Desktop Navigation */}
@@ -250,6 +249,10 @@ export default function Navigation() {
                                 <span></span>
                             </div>
                         </button>
+
+                        <div className="flex items-center space-x-4">
+                          <ThemeToggle />
+                        </div>
                     </div>
 
                     {/* Mobile Navigation */}
