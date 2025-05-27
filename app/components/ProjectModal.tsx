@@ -49,6 +49,18 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
         }
     };
 
+    const goToImage = (index: number) => {
+        if (project?.images && index !== currentImageIndex) {
+            // Determine direction based on current vs target index
+            const direction = index > currentImageIndex ? 'next' : 'prev';
+            setImageTransition(direction);
+            setTimeout(() => {
+                setCurrentImageIndex(index);
+                setImageTransition('none');
+            }, 150);
+        }
+    };
+
     const handleClose = () => {
         setCurrentImageIndex(0);
         setImageTransition('none');
@@ -84,10 +96,10 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                 <div className="relative overflow-hidden">
                     <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
                         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-2000 ease-out ${imageTransition === 'next'
-                                ? 'transform -translate-x-full opacity-0 scale-95'
-                                : imageTransition === 'prev'
-                                    ? 'transform translate-x-full opacity-0 scale-95'
-                                    : 'transform translate-x-0 opacity-100 scale-100'
+                            ? 'transform -translate-x-full opacity-0 scale-95'
+                            : imageTransition === 'prev'
+                                ? 'transform translate-x-full opacity-0 scale-95'
+                                : 'transform translate-x-0 opacity-100 scale-100'
                             }`}>
                             <Image
                                 key={`${currentImageIndex}-${imageTransition}`}
@@ -138,10 +150,11 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                             {project.images.map((image, index) => (
                                 <button
                                     key={index}
-                                    onClick={() => setCurrentImageIndex(index)}
-                                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${index === currentImageIndex
-                                            ? 'border-purple-500 shadow-lg shadow-purple-500/25'
-                                            : 'border-gray-300 dark:border-white/20 hover:border-gray-400 dark:hover:border-white/40'
+                                    onClick={() => goToImage(index)}
+                                    disabled={imageTransition !== 'none'}
+                                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${index === currentImageIndex
+                                        ? 'border-purple-500 shadow-lg shadow-purple-500/25'
+                                        : 'border-gray-300 dark:border-white/20 hover:border-gray-400 dark:hover:border-white/40'
                                         }`}
                                     style={{ animationDelay: `${index * 50}ms` }}
                                 >
