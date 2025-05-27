@@ -39,11 +39,83 @@
 }
 
 @keyframes shimmer-wave {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
+  0%, 100% { 
+    transform: translateX(-100%); 
+  }
+  50% { 
+    transform: translateX(100%); 
+  }
 }
 
 @keyframes shimmer {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
+  0%, 100% { 
+    transform: translateX(-100%); 
+  }
+  50% { 
+    transform: translateX(100%); 
+  }
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.container.dark {
+  /* Dark theme styles if needed */
+}
+
+.topBorder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.bottomBorder {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.borderElement {
+  position: absolute;
+  inset: 0;
+  width: 200%;
+}
+
+.glowElement {
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  filter: blur(4px);
+}
+
+.content {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.waveAnimation {
+  animation: wave-motion 1s ease-in-out infinite;
+}
+
+.waveReverseAnimation {
+  animation: wave-motion-reverse 1s ease-in-out infinite;
+}
+
+.shimmerAnimation {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.shimmerWaveAnimation {
+  animation: shimmer-wave 3s ease-in-out infinite, wave-motion-reverse 1s ease-in-out infinite;
 }
