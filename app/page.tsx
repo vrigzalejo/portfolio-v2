@@ -22,7 +22,7 @@ export default function Home() {
       </main>
       <footer className="py-8 px-4 border-t border-gray-800 glass-effect shadow-[0px_10px_30px_rgba(0,0,0,0.3)]">
         <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-400">© {new Date().getFullYear()} Brigido Alejo</p>
+          <p className="text-gray-900 dark:text-white font-bold">© {new Date().getFullYear()} Made with ❤️ by Brigido Alejo</p>
         </div>
       </footer>
     </>

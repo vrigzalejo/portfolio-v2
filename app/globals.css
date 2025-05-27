@@ -25,16 +25,29 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: #0a0a0a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--foreground);
+  background: linear-gradient(45deg, #ededed, #cfcfcf);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--background);
+  background: linear-gradient(45deg, #cfcfcf, #b0b0b0); /* Light mode hover effect */
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #ededed;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #0a0a0a, #555555);
+  border-radius: 5px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #555555, #777777); /* Dark mode hover effect */
 }
 
 html {
@@ -53,13 +66,6 @@ button, a {
   cursor: pointer;
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .glass-effect {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -73,36 +79,6 @@ button, a {
 @keyframes floating {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
-}
-
-.gradient-shift-bg {
-  background: linear-gradient(-45deg, #0f0f23, #1a1a2e, #16213e, #0f3460);
-  background-size: 400% 400%;
-  animation: gradientShift 5s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.project-card {
-  transition: all 10.3s ease;
-  transform-style: preserve-3d;
-}
-
-.project-card:hover {
-  transform: rotateY(15deg) rotateX(5deg);
-}
-
-.skill-orb {
-  transition: all 0.3s ease;
-}
-
-.skill-orb:hover {
-  transform: scale(1.1);
-  filter: brightness(1.2);
 }
 
 .scroll-indicator {

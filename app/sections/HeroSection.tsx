@@ -39,7 +39,7 @@ export default function HeroSection() {
                         </div>
                     </div>
                     <Link href="#jobs">
-                        <svg className="scroll-indicator w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="scroll-indicator w-6 h-6 mx-auto text-gray-900 dark:text-white " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                         </svg>
                     </Link>

@@ -106,18 +106,18 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 {/* Backdrop */}
                 <div
-                    className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                    className="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
                     onClick={onClose}
                 />
 
                 {/* Modal */}
-                <div className="relative w-full max-w-md bg-gray-900/95 backdrop-blur-md rounded-2xl border border-gray-700/50 shadow-2xl">
+                <div className="relative w-full max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-gray-700/50 shadow-2xl">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-700/50">
-                        <h2 className="text-xl font-semibold text-white">Get In Touch</h2>
+                    <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700/50">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Get In Touch</h2>
                         <button
                             onClick={onClose}
-                            className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                         >
                             <X size={20} />
                         </button>
@@ -127,7 +127,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
                         {/* Name Field */}
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Name *
                             </label>
                             <input
@@ -136,16 +136,18 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleInputChange}
-                                className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.name ? 'border-red-500' : 'border-gray-600'
+                                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.name
+                                        ? 'border-red-500'
+                                        : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="Your name"
                             />
-                            {errors.name && <p className="mt-1 text-sm text-red-400">{errors.name}</p>}
+                            {errors.name && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.name}</p>}
                         </div>
 
                         {/* Email Field */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Email *
                             </label>
                             <input
@@ -154,16 +156,18 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.email ? 'border-red-500' : 'border-gray-600'
+                                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.email
+                                        ? 'border-red-500'
+                                        : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="your@email.com"
                             />
-                            {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email}</p>}
+                            {errors.email && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.email}</p>}
                         </div>
 
                         {/* Subject Field */}
                         <div>
-                            <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
+                            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Subject *
                             </label>
                             <input
@@ -172,16 +176,18 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 name="subject"
                                 value={formData.subject}
                                 onChange={handleInputChange}
-                                className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.subject ? 'border-red-500' : 'border-gray-600'
+                                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.subject
+                                        ? 'border-red-500'
+                                        : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="What's this about?"
                             />
-                            {errors.subject && <p className="mt-1 text-sm text-red-400">{errors.subject}</p>}
+                            {errors.subject && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.subject}</p>}
                         </div>
 
                         {/* Message Field */}
                         <div>
-                            <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+                            <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Message *
                             </label>
                             <textarea
@@ -190,22 +196,24 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 value={formData.message}
                                 onChange={handleInputChange}
                                 rows={4}
-                                className={`w-full px-4 py-3 bg-gray-800/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors resize-none ${errors.message ? 'border-red-500' : 'border-gray-600'
+                                className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors resize-none ${errors.message
+                                        ? 'border-red-500'
+                                        : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="Tell me about your project..."
                             />
-                            {errors.message && <p className="mt-1 text-sm text-red-400">{errors.message}</p>}
+                            {errors.message && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.message}</p>}
                         </div>
 
                         {/* Status Messages */}
                         {submitStatus === 'success' && (
-                            <div className="p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-sm">
+                            <div className="p-3 bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/50 rounded-lg text-green-700 dark:text-green-400 text-sm">
                                 ✅ Message sent successfully! I'll get back to you soon.
                             </div>
                         )}
 
                         {submitStatus === 'error' && (
-                            <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                            <div className="p-3 bg-red-100 dark:bg-red-500/20 border border-red-300 dark:border-red-500/50 rounded-lg text-red-700 dark:text-red-400 text-sm">
                                 ❌ Failed to send message. Please try again.
                             </div>
                         )}
