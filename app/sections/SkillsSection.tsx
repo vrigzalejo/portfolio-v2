@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState, useMemo } from 'react'
+import React, { useRef, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import WaveText from '@/components/WaveText'
@@ -34,6 +34,16 @@ export default function SkillsSection() {
     const sceneRef = useRef(null)
     const rendererRef = useRef(null)
     const frameRef = useRef(null)
+
+    // Mouse drag state
+    const dragStateRef = useRef({
+        isDragging: false,
+        previousMousePosition: { x: 0, y: 0 },
+        rotation: { x: 0, y: 0 },
+        velocity: { x: 0, y: 0 },
+        damping: 0.95,
+        autoRotate: true
+    })
 
     // Create skill spheres data
     const skillSpheres = useMemo(() => {
@@ -103,6 +113,10 @@ export default function SkillsSection() {
         const rimLight = new THREE.DirectionalLight(0xff6b6b, 0.2)
         rimLight.position.set(0, 0, -10)
         scene.add(rimLight)
+
+        // Create a group to hold all text meshes for easier rotation
+        const textGroup = new THREE.Group()
+        scene.add(textGroup)
 
         // Create 3D text skills
         const textMeshes = []
@@ -195,7 +209,7 @@ export default function SkillsSection() {
                 isHovered: false
             }
 
-            scene.add(sprite)
+            textGroup.add(sprite)
             textMeshes.push(sprite)
         }
 
@@ -204,39 +218,91 @@ export default function SkillsSection() {
             createTextMesh(skillData.name, skillData, index)
         })
 
-        // Enhanced mouse interaction with smooth transitions
+        // Mouse drag functionality
+        const handleMouseDown = (event) => {
+            dragStateRef.current.isDragging = true
+            dragStateRef.current.autoRotate = false
+            dragStateRef.current.previousMousePosition = {
+                x: event.clientX,
+                y: event.clientY
+            }
+            document.body.style.cursor = 'grabbing'
+        }
+
         const handleMouseMove = (event) => {
             const rect = renderer.domElement.getBoundingClientRect()
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
 
-            raycaster.setFromCamera(mouse, camera)
-            const intersects = raycaster.intersectObjects(textMeshes)
-
-            // Reset all hover states
-            textMeshes.forEach(sprite => {
-                if (sprite.userData) {
-                    sprite.userData.isHovered = false
-                    sprite.userData.targetScale.copy(sprite.userData.originalScale)
-                    sprite.userData.targetOpacity = 1
+            if (dragStateRef.current.isDragging) {
+                const deltaMove = {
+                    x: event.clientX - dragStateRef.current.previousMousePosition.x,
+                    y: event.clientY - dragStateRef.current.previousMousePosition.y
                 }
-            })
 
-            if (intersects.length > 0) {
-                const intersectedSprite = intersects[0].object
-                if (intersectedSprite.userData) {
-                    intersectedSprite.userData.isHovered = true
-                    intersectedSprite.userData.targetScale.copy(intersectedSprite.userData.originalScale)
-                    intersectedSprite.userData.targetScale.multiplyScalar(1.5)
-                    intersectedSprite.userData.targetOpacity = 1.2
+                // Convert mouse movement to rotation
+                const rotationSpeed = 0.005
+                dragStateRef.current.velocity.x = deltaMove.y * rotationSpeed
+                dragStateRef.current.velocity.y = deltaMove.x * rotationSpeed
+
+                // Apply rotation to text group
+                dragStateRef.current.rotation.x += dragStateRef.current.velocity.x
+                dragStateRef.current.rotation.y += dragStateRef.current.velocity.y
+
+                // Update previous mouse position
+                dragStateRef.current.previousMousePosition = {
+                    x: event.clientX,
+                    y: event.clientY
                 }
-                document.body.style.cursor = 'pointer'
+
+                document.body.style.cursor = 'grabbing'
             } else {
-                document.body.style.cursor = 'default'
+                // Handle hover effects when not dragging
+                raycaster.setFromCamera(mouse, camera)
+                const intersects = raycaster.intersectObjects(textMeshes)
+
+                // Reset all hover states
+                textMeshes.forEach(sprite => {
+                    if (sprite.userData) {
+                        sprite.userData.isHovered = false
+                        sprite.userData.targetScale.copy(sprite.userData.originalScale)
+                        sprite.userData.targetOpacity = 1
+                    }
+                })
+
+                if (intersects.length > 0) {
+                    const intersectedSprite = intersects[0].object
+                    if (intersectedSprite.userData) {
+                        intersectedSprite.userData.isHovered = true
+                        intersectedSprite.userData.targetScale.copy(intersectedSprite.userData.originalScale)
+                        intersectedSprite.userData.targetScale.multiplyScalar(1.5)
+                        intersectedSprite.userData.targetOpacity = 1.2
+                    }
+                    document.body.style.cursor = 'pointer'
+                } else {
+                    document.body.style.cursor = dragStateRef.current.isDragging ? 'grabbing' : 'grab'
+                }
+            }
+        }
+
+        const handleMouseUp = () => {
+            if (dragStateRef.current.isDragging) {
+                dragStateRef.current.isDragging = false
+                document.body.style.cursor = 'grab'
+
+                // Resume auto-rotation after a delay if user stops interacting
+                setTimeout(() => {
+                    if (!dragStateRef.current.isDragging) {
+                        dragStateRef.current.autoRotate = true
+                    }
+                }, 3000)
             }
         }
 
         const handleClick = (event) => {
+            // Only handle clicks if not dragging
+            if (dragStateRef.current.isDragging) return
+
             const rect = renderer.domElement.getBoundingClientRect()
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
@@ -269,12 +335,47 @@ export default function SkillsSection() {
             }
         }
 
+        // Add event listeners
+        renderer.domElement.addEventListener('mousedown', handleMouseDown)
         renderer.domElement.addEventListener('mousemove', handleMouseMove)
+        renderer.domElement.addEventListener('mouseup', handleMouseUp)
         renderer.domElement.addEventListener('click', handleClick)
+
+        // Handle mouse leave to stop dragging
+        renderer.domElement.addEventListener('mouseleave', handleMouseUp)
+
+        // Set initial cursor
+        renderer.domElement.style.cursor = 'grab'
 
         // Animation loop with smooth transitions
         const animate = () => {
             frameRef.current = requestAnimationFrame(animate)
+
+            // Apply drag rotation to text group
+            if (dragStateRef.current.isDragging) {
+                textGroup.rotation.x = dragStateRef.current.rotation.x
+                textGroup.rotation.y = dragStateRef.current.rotation.y
+            } else {
+                // Apply damping to velocity when not dragging
+                dragStateRef.current.velocity.x *= dragStateRef.current.damping
+                dragStateRef.current.velocity.y *= dragStateRef.current.damping
+
+                // Continue rotation with momentum
+                dragStateRef.current.rotation.x += dragStateRef.current.velocity.x
+                dragStateRef.current.rotation.y += dragStateRef.current.velocity.y
+
+                textGroup.rotation.x = dragStateRef.current.rotation.x
+                textGroup.rotation.y = dragStateRef.current.rotation.y
+
+                // Auto-rotation when not being dragged
+                if (dragStateRef.current.autoRotate &&
+                    Math.abs(dragStateRef.current.velocity.x) < 0.001 &&
+                    Math.abs(dragStateRef.current.velocity.y) < 0.001) {
+                    const time = Date.now() * 0.0003
+                    textGroup.rotation.y += 0.002
+                    dragStateRef.current.rotation.y = textGroup.rotation.y
+                }
+            }
 
             // Animate text sprites with smooth transitions
             textMeshes.forEach((sprite, index) => {
@@ -292,7 +393,7 @@ export default function SkillsSection() {
                 sprite.userData.currentOpacity += (sprite.userData.targetOpacity - sprite.userData.currentOpacity) * lerpFactor
                 sprite.material.opacity = Math.min(1, sprite.userData.currentOpacity)
 
-                // Floating animation
+                // Floating animation (relative to original position)
                 const baseY = skillData.position.y
                 const floatOffset = Math.sin(Date.now() * 0.001 + index) * 0.4
                 const hoverOffset = sprite.userData.isHovered ? 0.3 : 0
@@ -300,15 +401,18 @@ export default function SkillsSection() {
 
                 // Enhanced rotation with hover effect
                 const rotationSpeed = sprite.userData.isHovered ? 0.002 : 0.0005
-                sprite.rotation.y = Math.sin(Date.now() * rotationSpeed + index) * 0.3
+                sprite.rotation.z = Math.sin(Date.now() * rotationSpeed + index) * 0.3
             })
 
-            // Dynamic camera rotation
-            const time = Date.now() * 0.0003
-            camera.position.x = Math.cos(time) * 10
-            camera.position.z = Math.sin(time) * 10
-            camera.position.y = Math.sin(time * 0.5) * 1.5
-            camera.lookAt(0, 0, 0)
+            // Dynamic camera movement (less aggressive when dragging)
+            if (!dragStateRef.current.isDragging) {
+                const time = Date.now() * 0.0002
+                const radius = 12
+                camera.position.x = Math.cos(time) * radius * 0.1
+                camera.position.z = radius + Math.sin(time) * 2
+                camera.position.y = Math.sin(time * 0.5) * 1
+                camera.lookAt(0, 0, 0)
+            }
 
             renderer.render(scene, camera)
         }
@@ -336,8 +440,11 @@ export default function SkillsSection() {
             }
 
             window.removeEventListener('resize', handleResize)
+            renderer.domElement.removeEventListener('mousedown', handleMouseDown)
             renderer.domElement.removeEventListener('mousemove', handleMouseMove)
+            renderer.domElement.removeEventListener('mouseup', handleMouseUp)
             renderer.domElement.removeEventListener('click', handleClick)
+            renderer.domElement.removeEventListener('mouseleave', handleMouseUp)
 
             if (mountRef.current && renderer.domElement) {
                 mountRef.current.removeChild(renderer.domElement)
