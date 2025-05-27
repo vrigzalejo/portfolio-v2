@@ -117,7 +117,7 @@ export default function ProjectsSection() {
                                         {project.tags.map((tag) => (
                                             <span
                                                 key={tag}
-                                                className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600/30'} rounded-full text-sm`}
+                                                className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600/30'} text-white rounded-full text-sm`}
                                             >
                                                 {tag}
                                             </span>

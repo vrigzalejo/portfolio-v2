@@ -32,14 +32,14 @@ export default function HeroSection() {
                         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
                             <button
                                 onClick={() => scrollToSelector('#projects')}
-                                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105"
+                                className="px-8 py-3 bg-gradient-to-r text-white from-purple-600 to-blue-600 rounded-full hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105"
                             >
                                 View My Works
                             </button>
                         </div>
                     </div>
                     <Link href="#jobs">
-                        <svg className="scroll-indicator w-6 h-6 mx-auto text-gray-900 dark:text-white " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="scroll-indicator w-6 h-6 mx-auto text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                         </svg>
                     </Link>

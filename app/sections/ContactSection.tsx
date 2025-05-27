@@ -50,7 +50,7 @@ export default function ContactSection() {
                             </div>
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="px-12 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105"
+                                className="px-12 py-4 bg-gradient-to-r text-white from-purple-600 to-blue-600 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105"
                             >
                                 Get In Touch
                             </button>
