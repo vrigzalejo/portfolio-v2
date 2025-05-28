@@ -10,8 +10,7 @@ import WaveText from "@/components/WaveText";
 export default function AboutSection() {
     const stats = [
         { number: '50+', label: 'Projects', color: 'text-purple-400' },
-        { number: '5+', label: 'Years', color: 'text-blue-400' },
-        { number: '100+', label: 'Clients', color: 'text-green-400' },
+        { number: '10+', label: 'Years', color: 'text-blue-400' },
     ]
 
     const title = '👤 About Me'
@@ -23,15 +22,12 @@ export default function AboutSection() {
                     <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="glass-effect dark:bg-gray-800 shadow-lg p-8 rounded-2xl">
-                            <h3 className="text-gray-900 dark:text-white text-2xl font-semibold mb-6">Creative Developer</h3>
+                            <h3 className="text-gray-900 dark:text-white text-2xl font-semibold mb-6">Full-Stack Web Developer</h3>
                             <p className="text-gray-900 dark:text-white mb-6 leading-relaxed">
-                                I'm a passionate full-stack developer with 5+ years of experience creating immersive digital experiences.
-                                I specialize in combining cutting-edge web technologies with 3D graphics to build applications that push
-                                the boundaries of what's possible on the web.
+                                I'm passionate about creating seamless, user-friendly web applications that solve real-world problems. With a decade of experience as a Full-Stack Web Developer, I specialize in front-end and back-end technologies, crafting clean, efficient, and scalable solutions. Constantly learning and adapting to the latest trends, I thrive on building intuitive digital experiences that exceed expectations.
                             </p>
                             <p className="text-gray-900 dark:text-white leading-relaxed mb-8">
-                                When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects,
-                                or experimenting with 3D art and animation.
+                                When I'm not coding, you'll find me exploring new technologies, vlogging, playing games, contributing to open-source projects, or creating exciting projects.
                             </p>
                             <div className="flex justify-around">
                                 {stats.map((stat, index) => (

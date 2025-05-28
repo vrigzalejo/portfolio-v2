@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useMemo } from 'react'
+import React, { useRef, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import WaveText from '@/components/WaveText'
@@ -34,6 +34,10 @@ export default function SkillsSection() {
     const sceneRef = useRef(null)
     const rendererRef = useRef(null)
     const frameRef = useRef(null)
+
+    // State for drag indicator
+    const [showDragIndicator, setShowDragIndicator] = useState(true)
+    const [hasInteracted, setHasInteracted] = useState(false)
 
     // Mouse drag state
     const dragStateRef = useRef({
@@ -70,6 +74,20 @@ export default function SkillsSection() {
             }
         })
     }, [])
+
+    // Hide drag indicator after first interaction
+    const handleUserInteraction = () => {
+        if (!hasInteracted) {
+            setHasInteracted(true)
+            setShowDragIndicator(false)
+        }
+    }
+
+    // Handle notification click to dismiss
+    const handleNotificationClick = () => {
+        setShowDragIndicator(false)
+        setHasInteracted(true)
+    }
 
     useEffect(() => {
         if (!mountRef.current) return
@@ -220,6 +238,7 @@ export default function SkillsSection() {
 
         // Mouse drag functionality
         const handleMouseDown = (event) => {
+            handleUserInteraction()
             dragStateRef.current.isDragging = true
             dragStateRef.current.autoRotate = false
             dragStateRef.current.previousMousePosition = {
@@ -300,6 +319,7 @@ export default function SkillsSection() {
         }
 
         const handleClick = (event) => {
+            handleUserInteraction()
             // Only handle clicks if not dragging
             if (dragStateRef.current.isDragging) return
 
@@ -472,13 +492,85 @@ export default function SkillsSection() {
 
     return (
         <ClipPathBorders>
-            <section id="skills" className="section-bg">
+            <section id="skills" className="section-bg relative">
                 <div className="max-w-6xl mx-auto">
                     {/* Title positioned absolutely at the top */}
                     <WaveText
                         title={title}
                         className="text-4xl md:text-5xl font-bold"
                     />
+
+                    {/* Ultra Cool Drag Notification */}
+                    {showDragIndicator && (
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                            <div
+                                className="relative group cursor-pointer"
+                                onClick={handleNotificationClick}
+                            >
+                                {/* Outer glow ring */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-full blur-xl opacity-75 animate-pulse scale-110"></div>
+
+                                {/* Main notification body */}
+                                <div className="relative bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 text-white px-8 py-4 rounded-2xl shadow-2xl border border-purple-500/30 backdrop-blur-sm">
+                                    {/* Animated border */}
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 p-0.5">
+                                        <div className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 rounded-2xl w-full h-full"></div>
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="relative flex items-center space-x-4">
+                                        {/* Rotating drag icon */}
+                                        <div className="relative">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 flex items-center justify-center animate-spin" style={{ animationDuration: '3s' }}>
+                                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a4 4 0 00-2 7.5V15a1 1 0 01-2 0v-2.5a4 4 0 000-7V5a1 1 0 112 0v.5z" clipRule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            {/* Orbiting dots */}
+                                            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
+                                                <div className="w-2 h-2 bg-cyan-400 rounded-full absolute -top-1 left-1/2 transform -translate-x-1/2"></div>
+                                                <div className="w-2 h-2 bg-pink-400 rounded-full absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
+                                                <div className="w-2 h-2 bg-purple-400 rounded-full absolute top-1/2 -left-1 transform -translate-y-1/2"></div>
+                                                <div className="w-2 h-2 bg-yellow-400 rounded-full absolute top-1/2 -right-1 transform -translate-y-1/2"></div>
+                                            </div>
+                                        </div>
+
+                                        {/* Text content */}
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center space-x-2 mb-1">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-bold text-lg">
+                                                    Interactive 3D Skills
+                                                </span>
+                                            </div>
+                                            <div className="text-gray-300 text-sm flex items-center space-x-2">
+                                                <span>🖱️ Drag to rotate</span>
+                                                <span className="text-purple-400">•</span>
+                                                <span>👆 Click skills</span>
+                                                <span className="text-purple-400">•</span>
+                                                <span className="text-cyan-400">✨ Hover effects</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Close button */}
+                                        <div className="ml-4 opacity-60 hover:opacity-100 transition-opacity">
+                                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold hover:scale-110 transition-transform">
+                                                ×
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Floating particles */}
+                                    <div className="absolute inset-0 pointer-events-none">
+                                        <div className="absolute top-2 left-4 w-1 h-1 bg-cyan-400 rounded-full animate-ping" style={{ animationDelay: '0s' }}></div>
+                                        <div className="absolute top-6 right-8 w-1 h-1 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+                                        <div className="absolute bottom-3 left-12 w-1 h-1 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+                                        <div className="absolute bottom-6 right-4 w-1 h-1 bg-yellow-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="flex justify-center items-center">
                         {/* 3D Scene Container - Full screen */}
