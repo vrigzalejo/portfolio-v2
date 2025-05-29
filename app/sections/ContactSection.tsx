@@ -9,7 +9,7 @@ import Link from 'next/link';
 import TypewriterGlow from '@/components/TypewriterGlow';
 
 interface ContactMethod {
-    icon: JSX.Element;
+    icon: React.ReactElement;
     title: string
     url: string
 }

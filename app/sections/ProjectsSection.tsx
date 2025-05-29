@@ -49,22 +49,10 @@ const projects: Project[] = [
     }
 ]
 
-const tagColors: { [key: string]: string } = {
-    'React': 'bg-purple-600/80',
-    'Three.js': 'bg-blue-600/80',
-    'WebGL': 'bg-green-600/80',
-    'TypeScript': 'bg-purple-600/80',
-    'Canvas API': 'bg-blue-600/80',
-    'Physics': 'bg-red-600/80',
-    'Vue.js': 'bg-purple-600/80',
-    'D3.js': 'bg-blue-600/80',
-    'WebSockets': 'bg-yellow-600/80'
-}
-
 const title = '🚀 Featured Projects'
 
 export default function ProjectsSection() {
-    const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+    const [selectedProject, setSelectedProject] = useState<Project>()
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     const handleViewProject = (project: Project) => {
@@ -78,7 +66,7 @@ export default function ProjectsSection() {
 
     const closeModal = () => {
         setIsModalOpen(false)
-        setSelectedProject(null)
+        setSelectedProject(undefined)
     }
 
     return (
@@ -106,7 +94,7 @@ export default function ProjectsSection() {
                                         {project.tags.map((tag) => (
                                             <span
                                                 key={tag}
-                                                className={`px-3 py-1 ${tagColors[tag] || 'bg-gray-600/30'} text-white rounded-full text-sm`}
+                                                className='px-3 py-1 dark:bg-gray-600/30 bg-gray-600/80 text-white rounded-full text-sm'
                                             >
                                                 {tag}
                                             </span>
@@ -126,11 +114,11 @@ export default function ProjectsSection() {
                 </section>
             </ClipPathBorders>
 
-            <ProjectModal
+            {selectedProject && <ProjectModal
                 project={selectedProject}
                 isOpen={isModalOpen}
                 onClose={closeModal}
-            />
+            />}
         </>
     )
 }

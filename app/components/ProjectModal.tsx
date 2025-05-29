@@ -8,7 +8,6 @@ interface Project {
     id: number
     title: string
     description: string
-    emoji: string
     gradient: string
     tags: string[]
     url?: string
@@ -16,7 +15,7 @@ interface Project {
 }
 
 interface ProjectModalProps {
-    project: Project | null;
+    project: Project;
     isOpen: boolean;
     onClose: () => void;
 }

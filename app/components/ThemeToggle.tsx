@@ -28,7 +28,7 @@ export default function ThemeToggle() {
     useEffect(() => {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-        const handleChange = (e) => {
+        const handleChange = (e: MediaQueryListEvent) => {
             // Only auto-update if user hasn't manually set a preference
             if (!localStorage.getItem('theme')) {
                 const newTheme = e.matches ? 'dark' : 'light'
