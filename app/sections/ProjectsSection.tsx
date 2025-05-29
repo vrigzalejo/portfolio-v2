@@ -74,7 +74,7 @@ export default function ProjectsSection() {
             <ClipPathBorders>
                 <section id="projects" className="section-bg">
                     <div className="max-w-6xl mx-auto">
-                        <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
+                        <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {projects.map((project) => (
                                 <div key={project.id} className="glass-effect p-6 rounded-2xl shadow-lg">

@@ -48,7 +48,7 @@ export default function Navigation() {
       <div className={styles.floatingOrb} style={{ top: '-50px', right: '10%' }}></div>
       <div className={styles.floatingOrb} style={{ top: '-75px', left: '20%', animationDelay: '2s' }}></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-4">
             <div className={`text-3xl font-bold ${styles.logo}`}>

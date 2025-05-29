@@ -111,8 +111,11 @@ export default function JobsSection() {
     return (
         <ClipPathBorders>
             <section id="jobs" className="section-bg">
-                <div className="max-w-6xl mx-auto">
-                    <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
+                <div className="max-w-7xl mx-auto">
+                    <WaveText
+                        title={title}
+                        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold"
+                    />
                     <Timeline experiences={experiences} />
                 </div>
             </section>

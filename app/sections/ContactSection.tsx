@@ -34,7 +34,7 @@ export default function ContactSection() {
             <ClipPathBorders bottomHeight="0">
                 <section id="contact" className="section-bg">
                     <div className="max-w-4xl mx-auto text-center">
-                        <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
+                        <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
                         
                         <div className="flex flex-col items-center justify-center">
                             <TypewriterGlow className="mb-10" textSize="text-xl sm:text-2xl md:text-2xl lg:text-2xl" texts={texts}/>

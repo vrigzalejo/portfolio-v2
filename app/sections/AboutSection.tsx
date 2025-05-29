@@ -14,7 +14,7 @@ export default function AboutSection() {
         <ClipPathBorders>
             <section id="about" className="section-bg">
                 <div className="max-w-6xl mx-auto">
-                    <WaveText title={title} className="text-4xl md:text-5xl pb-1 mb-14 font-bold" />
+                    <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="glass-effect dark:bg-gray-800 shadow-lg p-8 rounded-2xl">
                             <h3 className="text-gray-900 dark:text-white text-2xl font-semibold mb-6">Full-Stack Web Developer</h3>
