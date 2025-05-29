@@ -426,7 +426,6 @@ export default function SkillsSection() {
                 if (dragStateRef.current.autoRotate &&
                     Math.abs(dragStateRef.current.velocity.x) < 0.001 &&
                     Math.abs(dragStateRef.current.velocity.y) < 0.001) {
-                    const time = Date.now() * 0.0003
                     textGroup.rotation.y += 0.002
                     dragStateRef.current.rotation.y = textGroup.rotation.y
                 }
