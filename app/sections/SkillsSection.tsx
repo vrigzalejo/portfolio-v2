@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useMemo, useState } from 'react'
+import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import WaveText from '@/components/WaveText'
@@ -45,10 +45,12 @@ const skills: Skill[] = [
 const title = '⚡ Skills & Technologies'
 
 export default function SkillsSection() {
-    const mountRef = useRef(null)
-    const sceneRef = useRef(null)
-    const rendererRef = useRef(null)
-    const frameRef = useRef(null)
+    const mountRef = useRef<HTMLDivElement>(null)
+    const sceneRef = useRef<THREE.Scene | null>(null)
+    const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+    const frameRef = useRef<number | null>(null)
+    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
+    const containerSizeRef = useRef({ width: 0, height: 0 })
 
     // State for drag indicator
     const [showDragIndicator, setShowDragIndicator] = useState(true)
@@ -68,7 +70,7 @@ export default function SkillsSection() {
     const skillSpheres = useMemo(() => {
         return skills.map((skill, index) => {
             const angle = (index / skills.length) * Math.PI * 2
-            const radius = 8 // Increased radius for more space
+            const radius = 8
             return {
                 ...skill,
                 position: {
@@ -90,31 +92,45 @@ export default function SkillsSection() {
         })
     }, [])
 
-    // Hide drag indicator after first interaction
-    const handleUserInteraction = () => {
+    // Handle user interaction callbacks
+    const handleUserInteraction = useCallback(() => {
         if (!hasInteracted) {
             setHasInteracted(true)
             setShowDragIndicator(false)
         }
-    }
+    }, [hasInteracted])
 
-    // Handle notification click to dismiss
-    const handleNotificationClick = () => {
+    const handleNotificationClick = useCallback(() => {
         setShowDragIndicator(false)
         setHasInteracted(true)
-    }
+    }, [])
+
+    // Get container dimensions
+    const getContainerSize = useCallback(() => {
+        if (!mountRef.current) return { width: 800, height: 600 }
+
+        const rect = mountRef.current.getBoundingClientRect()
+        return {
+            width: rect.width || 800,
+            height: Math.max(rect.height || 600, 600) // Minimum height
+        }
+    }, [])
 
     useEffect(() => {
         if (!mountRef.current) return
 
+        // Get initial container size
+        const containerSize = getContainerSize()
+        containerSizeRef.current = containerSize
+
         // Scene setup
         const scene = new THREE.Scene()
-        scene.background = null // Transparent background
+        scene.background = null
 
-        // Camera setup
+        // Camera setup with proper aspect ratio
         const camera = new THREE.PerspectiveCamera(
             75,
-            window.innerWidth / window.innerHeight,
+            containerSize.width / containerSize.height,
             0.1,
             1000
         )
@@ -126,11 +142,15 @@ export default function SkillsSection() {
             alpha: true,
             powerPreference: "high-performance"
         })
-        renderer.setSize(window.innerWidth, window.innerHeight)
+        renderer.setSize(containerSize.width, containerSize.height)
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-        mountRef.current.appendChild(renderer.domElement)
 
-        // Basic Lighting (shadows removed)
+        // Ensure mount element exists before appending
+        if (mountRef.current) {
+            mountRef.current.appendChild(renderer.domElement)
+        }
+
+        // Lighting setup
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
         scene.add(ambientLight)
 
@@ -138,7 +158,6 @@ export default function SkillsSection() {
         directionalLight.position.set(10, 10, 5)
         scene.add(directionalLight)
 
-        // Add additional lights for better 3D effect
         const fillLight = new THREE.DirectionalLight(0x4169e1, 0.3)
         fillLight.position.set(-10, -5, -5)
         scene.add(fillLight)
@@ -147,62 +166,59 @@ export default function SkillsSection() {
         rimLight.position.set(0, 0, -10)
         scene.add(rimLight)
 
-        // Create a group to hold all text meshes for easier rotation
+        // Create text group
         const textGroup = new THREE.Group()
         scene.add(textGroup)
 
-        // Create 3D text skills
-        const textMeshes = []
+        // Text meshes and interaction
+        const textMeshes: THREE.Sprite[] = []
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
 
-        // Create floating 3D text with unlimited dimensions
-        const createTextMesh = (text, skillData, index) => {
-            // Validate skillData
+        // Create text mesh function
+        const createTextMesh = (text: string, skillData: typeof skillSpheres[0], index: number) => {
             if (!skillData || !skillData.position) {
                 console.warn(`Invalid skillData for index ${index}:`, skillData)
                 return
             }
 
-            // Create dynamic high-resolution canvas based on text length
+            // Create canvas for text texture
             const canvas = document.createElement('canvas')
             const context = canvas.getContext('2d')
+            if (!context) return
 
-            // Set initial font to measure text
-            context.font = 'bold 120px Arial, sans-serif'
+            // Set font and measure text
+            const fontSize = 120
+            context.font = `bold ${fontSize}px Arial, sans-serif`
             const textMetrics = context.measureText(text)
 
-            // Calculate canvas dimensions based on text size with generous padding
             const textWidth = textMetrics.width
-            const textHeight = 120 // Font size
             const padding = 100
 
-            // Set canvas size to accommodate text without restrictions
+            // Set canvas dimensions
             canvas.width = Math.max(textWidth + padding * 2, 512)
-            canvas.height = Math.max(textHeight + padding * 2, 256)
+            canvas.height = Math.max(fontSize + padding * 2, 256)
 
-            // Clear canvas with transparent background
+            // Clear and redraw
             context.clearRect(0, 0, canvas.width, canvas.height)
-
-            // Re-set font properties after canvas resize
-            context.font = 'bold 120px Arial, sans-serif'
+            context.font = `bold ${fontSize}px Arial, sans-serif`
             context.textAlign = 'center'
             context.textBaseline = 'middle'
 
-            // Create text with enhanced glow effect
+            // Create glow effect
             context.shadowColor = skillData.color || '#ffffff'
             context.shadowOffsetX = 0
             context.shadowOffsetY = 0
 
-            // Draw multiple glow layers for stronger effect
+            // Multiple glow layers
             for (let i = 0; i < 8; i++) {
                 context.shadowBlur = 30 - i * 3
                 context.strokeStyle = skillData.color || '#ffffff'
-                context.lineWidth = 5 - i * 2
+                context.lineWidth = Math.max(5 - i * 2, 1)
                 context.strokeText(text, canvas.width / 2, canvas.height / 2)
             }
 
-            // Draw main text with gradient effect
+            // Main text with gradient
             const gradient = context.createLinearGradient(0, 0, 0, canvas.height)
             gradient.addColorStop(0, skillData.color)
             gradient.addColorStop(1, `${skillData.color}80`)
@@ -210,18 +226,17 @@ export default function SkillsSection() {
             context.shadowBlur = 0
             context.fillText(text, canvas.width / 2, canvas.height / 2)
 
-            // Add text outline for definition
+            // Text outline
             context.strokeStyle = '#ffffff'
             context.lineWidth = 6
             context.shadowBlur = 0
             context.strokeText(text, canvas.width / 2, canvas.height / 2)
 
-            // Create texture from canvas
+            // Create texture and sprite
             const texture = new THREE.CanvasTexture(canvas)
             texture.minFilter = THREE.LinearFilter
             texture.magFilter = THREE.LinearFilter
 
-            // Create sprite material
             const spriteMaterial = new THREE.SpriteMaterial({
                 map: texture,
                 transparent: true,
@@ -231,8 +246,8 @@ export default function SkillsSection() {
 
             const sprite = new THREE.Sprite(spriteMaterial)
 
-            // Dynamic scaling based on text length and canvas size - no limits
-            const baseScale = Math.max(textWidth / 200, 2) // Minimum scale of 2
+            // Scale based on text length
+            const baseScale = Math.max(textWidth / 200, 2)
             const aspectRatio = canvas.width / canvas.height
             sprite.scale.set(
                 baseScale * aspectRatio,
@@ -240,20 +255,19 @@ export default function SkillsSection() {
                 1
             )
 
-            // Set position safely
+            // Set position
             sprite.position.set(
-                skillData.position.x || 0,
-                skillData.position.y || 0,
-                skillData.position.z || 0
+                skillData.position.x,
+                skillData.position.y,
+                skillData.position.z
             )
 
-            // Store original scale and create animation properties
+            // Store sprite data
             const originalScale = sprite.scale.clone()
-
             sprite.userData = {
                 skill: skillData,
                 index,
-                originalY: skillData.position.y || 0,
+                originalY: skillData.position.y,
                 originalScale: originalScale,
                 targetScale: originalScale.clone(),
                 currentScale: originalScale.clone(),
@@ -266,13 +280,13 @@ export default function SkillsSection() {
             textMeshes.push(sprite)
         }
 
-        // Create text meshes for each skill
+        // Create all text meshes
         skillSpheres.forEach((skillData, index) => {
             createTextMesh(skillData.name, skillData, index)
         })
 
-        // Mouse drag functionality
-        const handleMouseDown = (event) => {
+        // Mouse event handlers
+        const handleMouseDown = (event: MouseEvent) => {
             handleUserInteraction()
             dragStateRef.current.isDragging = true
             dragStateRef.current.autoRotate = false
@@ -283,7 +297,9 @@ export default function SkillsSection() {
             document.body.style.cursor = 'grabbing'
         }
 
-        const handleMouseMove = (event) => {
+        const handleMouseMove = (event: MouseEvent) => {
+            if (!renderer.domElement) return
+
             const rect = renderer.domElement.getBoundingClientRect()
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
@@ -294,16 +310,13 @@ export default function SkillsSection() {
                     y: event.clientY - dragStateRef.current.previousMousePosition.y
                 }
 
-                // Convert mouse movement to rotation
                 const rotationSpeed = 0.005
                 dragStateRef.current.velocity.x = deltaMove.y * rotationSpeed
                 dragStateRef.current.velocity.y = deltaMove.x * rotationSpeed
 
-                // Apply rotation to text group
                 dragStateRef.current.rotation.x += dragStateRef.current.velocity.x
                 dragStateRef.current.rotation.y += dragStateRef.current.velocity.y
 
-                // Update previous mouse position
                 dragStateRef.current.previousMousePosition = {
                     x: event.clientX,
                     y: event.clientY
@@ -311,11 +324,11 @@ export default function SkillsSection() {
 
                 document.body.style.cursor = 'grabbing'
             } else {
-                // Handle hover effects when not dragging
+                // Handle hover effects
                 raycaster.setFromCamera(mouse, camera)
                 const intersects = raycaster.intersectObjects(textMeshes)
 
-                // Reset all hover states
+                // Reset hover states
                 textMeshes.forEach(sprite => {
                     if (sprite.userData) {
                         sprite.userData.isHovered = false
@@ -325,11 +338,11 @@ export default function SkillsSection() {
                 })
 
                 if (intersects.length > 0) {
-                    const intersectedSprite = intersects[0].object
+                    const intersectedSprite = intersects[0].object as THREE.Sprite
                     if (intersectedSprite.userData) {
                         intersectedSprite.userData.isHovered = true
                         intersectedSprite.userData.targetScale.copy(intersectedSprite.userData.originalScale)
-                        intersectedSprite.userData.targetScale.multiplyScalar(1.8) // Increased hover scale
+                        intersectedSprite.userData.targetScale.multiplyScalar(1.8)
                         intersectedSprite.userData.targetOpacity = 1.3
                     }
                     document.body.style.cursor = 'pointer'
@@ -344,7 +357,7 @@ export default function SkillsSection() {
                 dragStateRef.current.isDragging = false
                 document.body.style.cursor = 'grab'
 
-                // Resume auto-rotation after a delay if user stops interacting
+                // Resume auto-rotation after delay
                 setTimeout(() => {
                     if (!dragStateRef.current.isDragging) {
                         dragStateRef.current.autoRotate = true
@@ -353,10 +366,9 @@ export default function SkillsSection() {
             }
         }
 
-        const handleClick = (event) => {
+        const handleClick = (event: MouseEvent) => {
             handleUserInteraction()
-            // Only handle clicks if not dragging
-            if (dragStateRef.current.isDragging) return
+            if (dragStateRef.current.isDragging || !renderer.domElement) return
 
             const rect = renderer.domElement.getBoundingClientRect()
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
@@ -366,22 +378,19 @@ export default function SkillsSection() {
             const intersects = raycaster.intersectObjects(textMeshes)
 
             if (intersects.length > 0) {
-                const sprite = intersects[0].object
-                // Enhanced click animation with elastic effect
+                const sprite = intersects[0].object as THREE.Sprite
                 if (sprite.userData && sprite.userData.originalScale) {
                     const originalScale = sprite.userData.originalScale.clone()
 
-                    // Immediate scale down
+                    // Click animation
                     sprite.userData.targetScale.copy(originalScale)
                     sprite.userData.targetScale.multiplyScalar(0.5)
 
                     setTimeout(() => {
-                        // Scale up beyond target - more dramatic effect
                         sprite.userData.targetScale.copy(originalScale)
                         sprite.userData.targetScale.multiplyScalar(2.5)
 
                         setTimeout(() => {
-                            // Return to hover state
                             sprite.userData.targetScale.copy(originalScale)
                             sprite.userData.targetScale.multiplyScalar(1.8)
                         }, 150)
@@ -391,27 +400,24 @@ export default function SkillsSection() {
         }
 
         // Add event listeners
-        renderer.domElement.addEventListener('mousedown', handleMouseDown)
-        renderer.domElement.addEventListener('mousemove', handleMouseMove)
-        renderer.domElement.addEventListener('mouseup', handleMouseUp)
-        renderer.domElement.addEventListener('click', handleClick)
+        const canvas = renderer.domElement
+        canvas.addEventListener('mousedown', handleMouseDown)
+        canvas.addEventListener('mousemove', handleMouseMove)
+        canvas.addEventListener('mouseup', handleMouseUp)
+        canvas.addEventListener('click', handleClick)
+        canvas.addEventListener('mouseleave', handleMouseUp)
+        canvas.style.cursor = 'grab'
 
-        // Handle mouse leave to stop dragging
-        renderer.domElement.addEventListener('mouseleave', handleMouseUp)
-
-        // Set initial cursor
-        renderer.domElement.style.cursor = 'grab'
-
-        // Animation loop with smooth transitions
+        // Animation loop
         const animate = () => {
             frameRef.current = requestAnimationFrame(animate)
 
-            // Apply drag rotation to text group
+            // Apply rotations to text group
             if (dragStateRef.current.isDragging) {
                 textGroup.rotation.x = dragStateRef.current.rotation.x
                 textGroup.rotation.y = dragStateRef.current.rotation.y
             } else {
-                // Apply damping to velocity when not dragging
+                // Apply damping
                 dragStateRef.current.velocity.x *= dragStateRef.current.damping
                 dragStateRef.current.velocity.y *= dragStateRef.current.damping
 
@@ -422,7 +428,7 @@ export default function SkillsSection() {
                 textGroup.rotation.x = dragStateRef.current.rotation.x
                 textGroup.rotation.y = dragStateRef.current.rotation.y
 
-                // Auto-rotation when not being dragged
+                // Auto-rotation
                 if (dragStateRef.current.autoRotate &&
                     Math.abs(dragStateRef.current.velocity.x) < 0.001 &&
                     Math.abs(dragStateRef.current.velocity.y) < 0.001) {
@@ -431,34 +437,31 @@ export default function SkillsSection() {
                 }
             }
 
-            // Animate text sprites with smooth transitions
+            // Animate sprites
             textMeshes.forEach((sprite, index) => {
                 const skillData = skillSpheres[index]
-
-                // Safety check
                 if (!skillData || !skillData.position || !sprite.userData) return
 
-                // Smooth scale transition
+                // Smooth transitions
                 const lerpFactor = 0.1
                 sprite.userData.currentScale.lerp(sprite.userData.targetScale, lerpFactor)
                 sprite.scale.copy(sprite.userData.currentScale)
 
-                // Smooth opacity transition
                 sprite.userData.currentOpacity += (sprite.userData.targetOpacity - sprite.userData.currentOpacity) * lerpFactor
                 sprite.material.opacity = Math.min(1, sprite.userData.currentOpacity)
 
-                // Floating animation (relative to original position)
+                // Floating animation
                 const baseY = skillData.position.y
                 const floatOffset = Math.sin(Date.now() * 0.001 + index) * 0.6
                 const hoverOffset = sprite.userData.isHovered ? 0.5 : 0
                 sprite.position.y = baseY + floatOffset + hoverOffset
 
-                // Enhanced rotation with hover effect
+                // Rotation animation
                 const rotationSpeed = sprite.userData.isHovered ? 0.003 : 0.0008
                 sprite.rotation.z = Math.sin(Date.now() * rotationSpeed + index) * 0.3
             })
 
-            // Dynamic camera movement (less aggressive when dragging)
+            // Dynamic camera movement
             if (!dragStateRef.current.isDragging) {
                 const time = Date.now() * 0.0002
                 const radius = 15
@@ -473,68 +476,99 @@ export default function SkillsSection() {
 
         // Handle resize
         const handleResize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight
+            const newSize = getContainerSize()
+            containerSizeRef.current = newSize
+
+            camera.aspect = newSize.width / newSize.height
             camera.updateProjectionMatrix()
-            renderer.setSize(window.innerWidth, window.innerHeight)
+            renderer.setSize(newSize.width, newSize.height)
         }
 
-        window.addEventListener('resize', handleResize)
+        // Use ResizeObserver for better resize handling
+        let resizeObserver: ResizeObserver | null = null
+        if (mountRef.current && window.ResizeObserver) {
+            resizeObserver = new ResizeObserver(handleResize)
+            resizeObserver.observe(mountRef.current)
+        } else {
+            window.addEventListener('resize', handleResize)
+        }
 
         // Store references
         sceneRef.current = scene
         rendererRef.current = renderer
+        cameraRef.current = camera
 
         // Start animation
         animate()
 
-        // Cleanup
+        // Cleanup function
         return () => {
+            // Cancel animation frame
             if (frameRef.current) {
                 cancelAnimationFrame(frameRef.current)
+                frameRef.current = null
             }
 
-            window.removeEventListener('resize', handleResize)
-            renderer.domElement.removeEventListener('mousedown', handleMouseDown)
-            renderer.domElement.removeEventListener('mousemove', handleMouseMove)
-            renderer.domElement.removeEventListener('mouseup', handleMouseUp)
-            renderer.domElement.removeEventListener('click', handleClick)
-            renderer.domElement.removeEventListener('mouseleave', handleMouseUp)
-
-            if (mountRef.current && renderer.domElement) {
-                mountRef.current.removeChild(renderer.domElement)
+            // Remove event listeners
+            if (resizeObserver) {
+                resizeObserver.disconnect()
+            } else {
+                window.removeEventListener('resize', handleResize)
             }
 
-            // Dispose of Three.js objects
+            const canvas = renderer.domElement
+            if (canvas) {
+                canvas.removeEventListener('mousedown', handleMouseDown)
+                canvas.removeEventListener('mousemove', handleMouseMove)
+                canvas.removeEventListener('mouseup', handleMouseUp)
+                canvas.removeEventListener('click', handleClick)
+                canvas.removeEventListener('mouseleave', handleMouseUp)
+            }
+
+            // Remove DOM element
+            if (mountRef.current && canvas && mountRef.current.contains(canvas)) {
+                mountRef.current.removeChild(canvas)
+            }
+
+            // Dispose Three.js resources
             scene.traverse((object) => {
-                if (object.geometry) object.geometry.dispose()
-                if (object.material) {
-                    if (Array.isArray(object.material)) {
-                        object.material.forEach(material => {
-                            if (material.map) material.map.dispose()
-                            material.dispose()
-                        })
-                    } else {
-                        if (object.material.map) object.material.map.dispose()
-                        object.material.dispose()
+                if (object instanceof THREE.Mesh || object instanceof THREE.Sprite) {
+                    if (object.geometry) object.geometry.dispose()
+                    if (object.material) {
+                        if (Array.isArray(object.material)) {
+                            object.material.forEach(material => {
+                                if (material.map) material.map.dispose()
+                                material.dispose()
+                            })
+                        } else {
+                            if (object.material.map) object.material.map.dispose()
+                            object.material.dispose()
+                        }
                     }
                 }
             })
+
             renderer.dispose()
             document.body.style.cursor = 'default'
+
+            // Clear references
+            sceneRef.current = null
+            rendererRef.current = null
+            cameraRef.current = null
         }
-    }, [skillSpheres])
+    }, [skillSpheres, handleUserInteraction, getContainerSize])
 
     return (
         <ClipPathBorders>
-            <section id="skills" className="section-bg relative">
-                <div className="max-w-6xl mx-auto">
-                    {/* Title positioned absolutely at the top */}
+            <section id="skills" className="section-bg relative min-h-screen">
+                <div className="max-w-6xl mx-auto px-4">
+                    {/* Title */}
                     <WaveText
                         title={title}
-                        className="text-4xl md:text-5xl font-bold"
+                        className="text-4xl md:text-5xl font-bold mb-8"
                     />
 
-                    {/* Ultra Cool Drag Notification - Repositioned to top-right */}
+                    {/* Drag Notification */}
                     {showDragIndicator && (
                         <div className="absolute top-8 right-8 z-10">
                             <div
@@ -570,7 +604,7 @@ export default function SkillsSection() {
                                             </div>
                                         </div>
 
-                                        {/* Text content - Condensed */}
+                                        {/* Text content */}
                                         <div className="flex flex-col">
                                             <div className="flex items-center space-x-2 mb-0.5">
                                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-bold text-base">
@@ -606,11 +640,11 @@ export default function SkillsSection() {
                         </div>
                     )}
 
-                    <div className="flex justify-center items-center">
-                        {/* 3D Scene Container - Full screen */}
+                    {/* 3D Scene Container */}
+                    <div className="w-full h-96 md:h-[600px] flex justify-center items-center">
                         <div
                             ref={mountRef}
-                            className="flex justify-center items-center w-full h-full"
+                            className="w-full h-full"
                             style={{ background: 'transparent' }}
                         />
                     </div>

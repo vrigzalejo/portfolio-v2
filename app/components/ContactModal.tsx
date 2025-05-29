@@ -4,6 +4,16 @@ import Script from 'next/script'
 import { useState } from 'react'
 import { X, Send, Loader2 } from 'lucide-react'
 
+declare global {
+    interface Window {
+        grecaptcha: {
+            ready: (callback: () => void) => void;
+            execute: (siteKey: string, options: { action: string }) => Promise<string>;
+        };
+
+    }
+}
+  
 interface ContactModalProps {
     isOpen: boolean
     onClose: () => void
@@ -54,12 +64,14 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
         try {
             const token = await new Promise<string>((resolve, reject) => {
-                if (!window.grecaptcha) {
+                if (typeof window !== "undefined" && window.grecaptcha) {
+                    window.grecaptcha.ready(() => {
+                        window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then(resolve).catch(reject)
+                    })
+                } else {
                     reject(new Error('reCAPTCHA not loaded'))
                 }
-                window.grecaptcha.ready(() => {
-                    window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then(resolve).catch(reject)
-                })
+                  
             })
 
             const response = await fetch('/api/contact', {
