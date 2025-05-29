@@ -83,7 +83,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
             } else {
                 setSubmitStatus('error')
             }
-        } catch (error) {
+        } catch {
             setSubmitStatus('error')
         } finally {
             setIsSubmitting(false)
@@ -137,8 +137,8 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 value={formData.name}
                                 onChange={handleInputChange}
                                 className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.name
-                                        ? 'border-red-500'
-                                        : 'border-gray-300 dark:border-gray-600'
+                                    ? 'border-red-500'
+                                    : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="Your name"
                             />
@@ -157,8 +157,8 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.email
-                                        ? 'border-red-500'
-                                        : 'border-gray-300 dark:border-gray-600'
+                                    ? 'border-red-500'
+                                    : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="your@email.com"
                             />
@@ -177,8 +177,8 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 value={formData.subject}
                                 onChange={handleInputChange}
                                 className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${errors.subject
-                                        ? 'border-red-500'
-                                        : 'border-gray-300 dark:border-gray-600'
+                                    ? 'border-red-500'
+                                    : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="What's this about?"
                             />
@@ -197,8 +197,8 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                                 onChange={handleInputChange}
                                 rows={4}
                                 className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors resize-none ${errors.message
-                                        ? 'border-red-500'
-                                        : 'border-gray-300 dark:border-gray-600'
+                                    ? 'border-red-500'
+                                    : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                 placeholder="Tell me about your project..."
                             />
@@ -208,7 +208,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                         {/* Status Messages */}
                         {submitStatus === 'success' && (
                             <div className="p-3 bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/50 rounded-lg text-green-700 dark:text-green-400 text-sm">
-                                ✅ Message sent successfully! I'll get back to you soon.
+                                ✅ Message sent successfully! I&apos;ll get back to you soon.
                             </div>
                         )}
 
