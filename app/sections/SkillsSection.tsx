@@ -13,34 +13,41 @@ interface Skill {
 const skills: Skill[] = [
     { name: 'AWS', color: '#ff9900' },
     { name: 'Tailwind', color: '#38bdf8' },
-    { name: 'ThreeJS', color: '#ff4500' },
-    { name: 'Laravel', color: '#b12119' },
+    { name: 'ThreeJS', color: '#ff6347' },
+    { name: 'Laravel', color: '#f55247' },
     { name: 'Redis', color: '#d82c20' },
-    { name: 'Nginx', color: '#007f5f' },
-    { name: 'Symfony', color: '#313131' },
-    { name: 'Confluence', color: '#005fbf' },
-    { name: 'Jira', color: '#003366' },
+    { name: 'Nginx', color: '#009879' },
+    { name: 'Symfony', color: '#555555' },
     { name: 'GitHub', color: '#24292e' },
-    { name: 'Jenkins', color: '#cc342d' },
-    { name: 'Django', color: '#1b2b34' },
-    { name: 'Flask', color: '#7f7f7f' },
+    { name: 'Django', color: '#092e20' },
     { name: 'Selenium', color: '#76b900' },
     { name: 'Kubernetes', color: '#326ce5' },
     { name: 'React', color: '#00d8ff' },
     { name: 'Vue', color: '#4fc08d' },
-    { name: 'Angular', color: '#c3002f' },
+    { name: 'Angular', color: '#dd0031' },
     { name: 'TypeScript', color: '#007acc' },
     { name: 'GraphQL', color: '#e535ab' },
-    { name: 'Elasticsearch', color: '#f08d49' },
-    { name: 'PHP', color: '#4f5b93' },
+    { name: 'PHP', color: '#8892be' },
     { name: 'MySQL', color: '#00618a' },
-    { name: 'MongoDB', color: '#00684a' },
-    { name: 'WordPress', color: '#0085ba' },
-    { name: 'Drupal', color: '#00598c' },
-    { name: 'Node', color: '#43853d' },
-    { name: 'A.I.', color: '#ff007f' },
+    { name: 'MongoDB', color: '#00ed64' },
+    { name: 'Node.js', color: '#43853d' },
+    { name: 'AI', color: '#ff007f' },
     { name: 'Docker', color: '#0db7ed' },
+    { name: 'Vagrant', color: '#1868f2' },
+    { name: 'PostgreSQL', color: '#336791' },
+    { name: 'BurpSuite', color: '#f56f00' },
+    { name: 'Git', color: '#f14e32' },
+    { name: 'CI/CD', color: '#ffaa00' },
+    { name: 'Swagger', color: '#85ea2d' },
+    { name: 'Postman', color: '#ff6c37' },
+    { name: 'REST', color: '#f6b800' },
+    { name: 'Apache', color: '#d4202a' },
+    { name: 'Vercel', color: '#000000' },
+    { name: 'Heroku', color: '#6762a6' },
+    { name: 'Netlify', color: '#00c7b7' },
+    { name: 'Python', color: '#3776ab' },
 ];
+ 
 
 const title = '⚡ Skills & Technologies'
 
@@ -545,10 +552,7 @@ export default function SkillsSection() {
             <section id="skills" className="section-bg relative">
                 <div className="max-w-6xl mx-auto">
                     {/* Title positioned absolutely at the top */}
-                    <WaveText
-                        title={title}
-                        className="text-4xl md:text-5xl font-bold"
-                    />
+                    <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
 
                     {/* Ultra Cool Drag Notification - Repositioned to top-right */}
                     {showDragIndicator && (
