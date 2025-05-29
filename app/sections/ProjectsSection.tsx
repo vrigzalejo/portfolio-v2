@@ -33,7 +33,7 @@ const projects: Project[] = [
         description: 'This portfolio was created since 2013.',
         gradient: 'from-purple-600 to-pink-600',
         tags: ['AngularJS'],
-        url: 'https://vrigzalejo.github.io',
+        url: 'https://v1.brigidoalejo.com',
         cardImg: portfolioV1,
         cardHoverImg: portfolioV1Hover,
     },
