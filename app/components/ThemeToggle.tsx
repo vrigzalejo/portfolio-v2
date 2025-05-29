@@ -3,12 +3,43 @@ import { useEffect, useState } from 'react'
 
 export default function ThemeToggle() {
     const [theme, setTheme] = useState('light')
+    const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
-        const stored = localStorage.getItem('theme') || 'light'
-        setTheme(stored)
-        document.documentElement.classList.toggle('dark', stored === 'dark')
-    }, [theme])
+        // Check if user has a stored preference
+        const stored = localStorage.getItem('theme')
+
+        let initialTheme
+        if (stored) {
+            // Use stored preference if it exists
+            initialTheme = stored
+        } else {
+            // Detect system preference on first visit
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+            initialTheme = prefersDark ? 'dark' : 'light'
+        }
+
+        setTheme(initialTheme)
+        document.documentElement.classList.toggle('dark', initialTheme === 'dark')
+        setIsInitialized(true)
+    }, [])
+
+    // Listen for system theme changes (optional enhancement)
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+        const handleChange = (e) => {
+            // Only auto-update if user hasn't manually set a preference
+            if (!localStorage.getItem('theme')) {
+                const newTheme = e.matches ? 'dark' : 'light'
+                setTheme(newTheme)
+                document.documentElement.classList.toggle('dark', newTheme === 'dark')
+            }
+        }
+
+        mediaQuery.addEventListener('change', handleChange)
+        return () => mediaQuery.removeEventListener('change', handleChange)
+    }, [])
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light'
@@ -17,11 +48,14 @@ export default function ThemeToggle() {
         document.documentElement.classList.toggle('dark', newTheme === 'dark')
     }
 
+    // Prevent flash by not rendering until initialized
+    if (!isInitialized) return null
+
     return (
         <div className="flex items-center justify-center transition-colors duration-300">
             <button
                 onClick={toggleTheme}
-                className="relative inline-flex items-center h-12 w-24 rounded-full bg-gradient-to-r from-purple-600 to-indigo-800 transition-all duration-700 ease-in-out shadow-lg hover:shadow-xl focus:outline-none overflow-hidden  border-white/20 dark:border-gray-700/50"
+                className="relative inline-flex items-center h-12 w-24 rounded-full bg-gradient-to-r from-purple-600 to-indigo-800 transition-all duration-700 ease-in-out shadow-lg hover:shadow-xl focus:outline-none overflow-hidden border-white/20 dark:border-gray-700/50"
                 aria-label="Toggle Dark Mode"
             >
                 {/* Track Background */}

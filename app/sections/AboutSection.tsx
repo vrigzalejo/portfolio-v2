@@ -8,11 +8,6 @@ import HoverImage from "@/components/HoverImage";
 import WaveText from "@/components/WaveText";
 
 export default function AboutSection() {
-    const stats = [
-        { number: '50+', label: 'Projects', color: 'text-purple-400' },
-        { number: '10+', label: 'Years', color: 'text-blue-400' },
-    ]
-
     const title = '👤 About Me'
 
     return (
@@ -29,18 +24,6 @@ export default function AboutSection() {
                             <p className="text-gray-900 dark:text-white leading-relaxed mb-8">
                                 When I'm not coding, you'll find me exploring new technologies, vlogging, playing games, contributing to open-source projects, or creating exciting projects.
                             </p>
-                            <div className="flex justify-around">
-                                {stats.map((stat, index) => (
-                                    <div key={index} className="text-center">
-                                        <div className={`text-3xl font-bold ${stat.color}`}>
-                                            {stat.number}
-                                        </div>
-                                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                                            {stat.label}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                         <div className="relative">
                             <div className="w-96 h-96 mx-auto bg-gradient-to-br from-purple-600 to-blue-600 rounded-full opacity-20 animate-pulse"></div>

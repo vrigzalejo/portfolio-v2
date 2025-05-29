@@ -7,25 +7,40 @@ import WaveText from '@/components/WaveText'
 
 interface Skill {
     name: string
-    emoji: string
-    gradient: string
     color: string
 }
 
 const skills: Skill[] = [
-    { name: 'React', emoji: '⚛️', gradient: 'from-blue-500 to-blue-700', color: '#3b82f6' },
-    { name: 'Node.js', emoji: '🟢', gradient: 'from-green-500 to-green-700', color: '#10b981' },
-    { name: 'Three.js', emoji: '🎯', gradient: 'from-purple-500 to-purple-700', color: '#8b5cf6' },
-    { name: 'JavaScript', emoji: '⚡', gradient: 'from-yellow-400 to-orange-500', color: '#f59e0b' },
-    { name: 'TypeScript', emoji: '📘', gradient: 'from-blue-400 to-purple-500', color: '#3b82f6' },
-    { name: 'Tailwind', emoji: '🎨', gradient: 'from-pink-400 to-red-500', color: '#ec4899' },
-    { name: 'React', emoji: '⚛️', gradient: 'from-blue-500 to-blue-700', color: '#3b82f6' },
-    { name: 'Node.js', emoji: '🟢', gradient: 'from-green-500 to-green-700', color: '#10b981' },
-    { name: 'Three.js', emoji: '🎯', gradient: 'from-purple-500 to-purple-700', color: '#8b5cf6' },
-    { name: 'JavaScript', emoji: '⚡', gradient: 'from-yellow-400 to-orange-500', color: '#f59e0b' },
-    { name: 'TypeScript', emoji: '📘', gradient: 'from-blue-400 to-purple-500', color: '#3b82f6' },
-    { name: 'Tailwind', emoji: '🎨', gradient: 'from-pink-400 to-red-500', color: '#ec4899' },
-]
+    { name: 'AWS', color: '#ff9900' },
+    { name: 'Tailwind', color: '#38bdf8' },
+    { name: 'ThreeJS', color: '#ff4500' },
+    { name: 'Laravel', color: '#b12119' },
+    { name: 'Redis', color: '#d82c20' },
+    { name: 'Nginx', color: '#007f5f' },
+    { name: 'Symfony', color: '#313131' },
+    { name: 'Confluence', color: '#005fbf' },
+    { name: 'Jira', color: '#003366' },
+    { name: 'GitHub', color: '#24292e' },
+    { name: 'Jenkins', color: '#cc342d' },
+    { name: 'Django', color: '#1b2b34' },
+    { name: 'Flask', color: '#7f7f7f' },
+    { name: 'Selenium', color: '#76b900' },
+    { name: 'Kubernetes', color: '#326ce5' },
+    { name: 'React', color: '#00d8ff' },
+    { name: 'Vue', color: '#4fc08d' },
+    { name: 'Angular', color: '#c3002f' },
+    { name: 'TypeScript', color: '#007acc' },
+    { name: 'GraphQL', color: '#e535ab' },
+    { name: 'Elasticsearch', color: '#f08d49' },
+    { name: 'PHP', color: '#4f5b93' },
+    { name: 'MySQL', color: '#00618a' },
+    { name: 'MongoDB', color: '#00684a' },
+    { name: 'WordPress', color: '#0085ba' },
+    { name: 'Drupal', color: '#00598c' },
+    { name: 'Node', color: '#43853d' },
+    { name: 'A.I.', color: '#ff007f' },
+    { name: 'Docker', color: '#0db7ed' },
+];
 
 const title = '⚡ Skills & Technologies'
 
@@ -53,12 +68,12 @@ export default function SkillsSection() {
     const skillSpheres = useMemo(() => {
         return skills.map((skill, index) => {
             const angle = (index / skills.length) * Math.PI * 2
-            const radius = 6
+            const radius = 8 // Increased radius for more space
             return {
                 ...skill,
                 position: {
                     x: Math.cos(angle) * radius,
-                    y: Math.sin(angle * 0.5) * 2,
+                    y: Math.sin(angle * 0.5) * 3,
                     z: Math.sin(angle) * radius
                 },
                 rotation: {
@@ -103,7 +118,7 @@ export default function SkillsSection() {
             0.1,
             1000
         )
-        camera.position.set(0, 0, 12)
+        camera.position.set(0, 0, 15)
 
         // Renderer setup
         const renderer = new THREE.WebGLRenderer({
@@ -141,7 +156,7 @@ export default function SkillsSection() {
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
 
-        // Create floating 3D text
+        // Create floating 3D text with unlimited dimensions
         const createTextMesh = (text, skillData, index) => {
             // Validate skillData
             if (!skillData || !skillData.position) {
@@ -149,17 +164,28 @@ export default function SkillsSection() {
                 return
             }
 
-            // Create high-resolution canvas for text rendering
+            // Create dynamic high-resolution canvas based on text length
             const canvas = document.createElement('canvas')
             const context = canvas.getContext('2d')
-            canvas.width = 512
-            canvas.height = 128
+
+            // Set initial font to measure text
+            context.font = 'bold 120px Arial, sans-serif'
+            const textMetrics = context.measureText(text)
+
+            // Calculate canvas dimensions based on text size with generous padding
+            const textWidth = textMetrics.width
+            const textHeight = 120 // Font size
+            const padding = 100
+
+            // Set canvas size to accommodate text without restrictions
+            canvas.width = Math.max(textWidth + padding * 2, 512)
+            canvas.height = Math.max(textHeight + padding * 2, 256)
 
             // Clear canvas with transparent background
             context.clearRect(0, 0, canvas.width, canvas.height)
 
-            // Set font properties
-            context.font = 'bold 10em Arial, sans-serif'
+            // Re-set font properties after canvas resize
+            context.font = 'bold 120px Arial, sans-serif'
             context.textAlign = 'center'
             context.textBaseline = 'middle'
 
@@ -169,9 +195,10 @@ export default function SkillsSection() {
             context.shadowOffsetY = 0
 
             // Draw multiple glow layers for stronger effect
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 8; i++) {
+                context.shadowBlur = 30 - i * 3
                 context.strokeStyle = skillData.color || '#ffffff'
-                context.lineWidth = 12 - i * 2
+                context.lineWidth = 5 - i * 2
                 context.strokeText(text, canvas.width / 2, canvas.height / 2)
             }
 
@@ -180,15 +207,19 @@ export default function SkillsSection() {
             gradient.addColorStop(0, skillData.color)
             gradient.addColorStop(1, `${skillData.color}80`)
             context.fillStyle = gradient
+            context.shadowBlur = 0
             context.fillText(text, canvas.width / 2, canvas.height / 2)
 
             // Add text outline for definition
             context.strokeStyle = '#ffffff'
-            context.lineWidth = 3
+            context.lineWidth = 6
+            context.shadowBlur = 0
             context.strokeText(text, canvas.width / 2, canvas.height / 2)
 
             // Create texture from canvas
             const texture = new THREE.CanvasTexture(canvas)
+            texture.minFilter = THREE.LinearFilter
+            texture.magFilter = THREE.LinearFilter
 
             // Create sprite material
             const spriteMaterial = new THREE.SpriteMaterial({
@@ -200,10 +231,14 @@ export default function SkillsSection() {
 
             const sprite = new THREE.Sprite(spriteMaterial)
 
-            // Scale based on text length
-            const textMetrics = context.measureText(text)
-            const scale = Math.max(2, textMetrics.width / 100)
-            sprite.scale.set(scale, 1, 1)
+            // Dynamic scaling based on text length and canvas size - no limits
+            const baseScale = Math.max(textWidth / 200, 2) // Minimum scale of 2
+            const aspectRatio = canvas.width / canvas.height
+            sprite.scale.set(
+                baseScale * aspectRatio,
+                baseScale,
+                1
+            )
 
             // Set position safely
             sprite.position.set(
@@ -294,8 +329,8 @@ export default function SkillsSection() {
                     if (intersectedSprite.userData) {
                         intersectedSprite.userData.isHovered = true
                         intersectedSprite.userData.targetScale.copy(intersectedSprite.userData.originalScale)
-                        intersectedSprite.userData.targetScale.multiplyScalar(1.5)
-                        intersectedSprite.userData.targetOpacity = 1.2
+                        intersectedSprite.userData.targetScale.multiplyScalar(1.8) // Increased hover scale
+                        intersectedSprite.userData.targetOpacity = 1.3
                     }
                     document.body.style.cursor = 'pointer'
                 } else {
@@ -338,17 +373,17 @@ export default function SkillsSection() {
 
                     // Immediate scale down
                     sprite.userData.targetScale.copy(originalScale)
-                    sprite.userData.targetScale.multiplyScalar(0.6)
+                    sprite.userData.targetScale.multiplyScalar(0.5)
 
                     setTimeout(() => {
-                        // Scale up beyond target
+                        // Scale up beyond target - more dramatic effect
                         sprite.userData.targetScale.copy(originalScale)
-                        sprite.userData.targetScale.multiplyScalar(1.8)
+                        sprite.userData.targetScale.multiplyScalar(2.5)
 
                         setTimeout(() => {
                             // Return to hover state
                             sprite.userData.targetScale.copy(originalScale)
-                            sprite.userData.targetScale.multiplyScalar(1.5)
+                            sprite.userData.targetScale.multiplyScalar(1.8)
                         }, 150)
                     }, 100)
                 }
@@ -415,22 +450,22 @@ export default function SkillsSection() {
 
                 // Floating animation (relative to original position)
                 const baseY = skillData.position.y
-                const floatOffset = Math.sin(Date.now() * 0.001 + index) * 0.4
-                const hoverOffset = sprite.userData.isHovered ? 0.3 : 0
+                const floatOffset = Math.sin(Date.now() * 0.001 + index) * 0.6
+                const hoverOffset = sprite.userData.isHovered ? 0.5 : 0
                 sprite.position.y = baseY + floatOffset + hoverOffset
 
                 // Enhanced rotation with hover effect
-                const rotationSpeed = sprite.userData.isHovered ? 0.002 : 0.0005
+                const rotationSpeed = sprite.userData.isHovered ? 0.003 : 0.0008
                 sprite.rotation.z = Math.sin(Date.now() * rotationSpeed + index) * 0.3
             })
 
             // Dynamic camera movement (less aggressive when dragging)
             if (!dragStateRef.current.isDragging) {
                 const time = Date.now() * 0.0002
-                const radius = 12
+                const radius = 15
                 camera.position.x = Math.cos(time) * radius * 0.1
                 camera.position.z = radius + Math.sin(time) * 2
-                camera.position.y = Math.sin(time * 0.5) * 1
+                camera.position.y = Math.sin(time * 0.5) * 1.5
                 camera.lookAt(0, 0, 0)
             }
 
@@ -500,9 +535,9 @@ export default function SkillsSection() {
                         className="text-4xl md:text-5xl font-bold"
                     />
 
-                    {/* Ultra Cool Drag Notification */}
+                    {/* Ultra Cool Drag Notification - Repositioned to top-right */}
                     {showDragIndicator && (
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                        <div className="absolute top-8 right-8 z-10">
                             <div
                                 className="relative group cursor-pointer"
                                 onClick={handleNotificationClick}
@@ -511,50 +546,50 @@ export default function SkillsSection() {
                                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-full blur-xl opacity-75 animate-pulse scale-110"></div>
 
                                 {/* Main notification body */}
-                                <div className="relative bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 text-white px-8 py-4 rounded-2xl shadow-2xl border border-purple-500/30 backdrop-blur-sm">
+                                <div className="relative bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 text-white px-6 py-3 rounded-2xl shadow-2xl border border-purple-500/30 backdrop-blur-sm">
                                     {/* Animated border */}
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 p-0.5">
                                         <div className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 rounded-2xl w-full h-full"></div>
                                     </div>
 
                                     {/* Content */}
-                                    <div className="relative flex items-center space-x-4">
+                                    <div className="relative flex items-center space-x-3">
                                         {/* Rotating drag icon */}
                                         <div className="relative">
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 flex items-center justify-center animate-spin" style={{ animationDuration: '3s' }}>
-                                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 flex items-center justify-center animate-spin" style={{ animationDuration: '3s' }}>
+                                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a4 4 0 00-2 7.5V15a1 1 0 01-2 0v-2.5a4 4 0 000-7V5a1 1 0 112 0v.5z" clipRule="evenodd" />
                                                 </svg>
                                             </div>
                                             {/* Orbiting dots */}
                                             <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
-                                                <div className="w-2 h-2 bg-cyan-400 rounded-full absolute -top-1 left-1/2 transform -translate-x-1/2"></div>
-                                                <div className="w-2 h-2 bg-pink-400 rounded-full absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
-                                                <div className="w-2 h-2 bg-purple-400 rounded-full absolute top-1/2 -left-1 transform -translate-y-1/2"></div>
-                                                <div className="w-2 h-2 bg-yellow-400 rounded-full absolute top-1/2 -right-1 transform -translate-y-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full absolute -top-0.5 left-1/2 transform -translate-x-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-pink-400 rounded-full absolute -bottom-0.5 left-1/2 transform -translate-x-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full absolute top-1/2 -left-0.5 transform -translate-y-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full absolute top-1/2 -right-0.5 transform -translate-y-1/2"></div>
                                             </div>
                                         </div>
 
-                                        {/* Text content */}
+                                        {/* Text content - Condensed */}
                                         <div className="flex flex-col">
-                                            <div className="flex items-center space-x-2 mb-1">
-                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-bold text-lg">
+                                            <div className="flex items-center space-x-2 mb-0.5">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-bold text-base">
                                                     Interactive 3D Skills
                                                 </span>
                                             </div>
-                                            <div className="text-gray-300 text-sm flex items-center space-x-2">
-                                                <span>🖱️ Drag to rotate</span>
+                                            <div className="text-gray-300 text-xs flex items-center space-x-1.5">
+                                                <span>🖱️ Drag</span>
                                                 <span className="text-purple-400">•</span>
-                                                <span>👆 Click skills</span>
+                                                <span>👆 Click</span>
                                                 <span className="text-purple-400">•</span>
-                                                <span className="text-cyan-400">✨ Hover effects</span>
+                                                <span className="text-cyan-400">✨ Hover</span>
                                             </div>
                                         </div>
 
                                         {/* Close button */}
-                                        <div className="ml-4 opacity-60 hover:opacity-100 transition-opacity">
-                                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold hover:scale-110 transition-transform">
+                                        <div className="ml-2 opacity-60 hover:opacity-100 transition-opacity">
+                                            <div className="w-5 h-5 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold hover:scale-110 transition-transform">
                                                 ×
                                             </div>
                                         </div>
@@ -562,10 +597,10 @@ export default function SkillsSection() {
 
                                     {/* Floating particles */}
                                     <div className="absolute inset-0 pointer-events-none">
-                                        <div className="absolute top-2 left-4 w-1 h-1 bg-cyan-400 rounded-full animate-ping" style={{ animationDelay: '0s' }}></div>
-                                        <div className="absolute top-6 right-8 w-1 h-1 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
-                                        <div className="absolute bottom-3 left-12 w-1 h-1 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
-                                        <div className="absolute bottom-6 right-4 w-1 h-1 bg-yellow-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                                        <div className="absolute top-1 left-3 w-0.5 h-0.5 bg-cyan-400 rounded-full animate-ping" style={{ animationDelay: '0s' }}></div>
+                                        <div className="absolute top-4 right-6 w-0.5 h-0.5 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+                                        <div className="absolute bottom-2 left-8 w-0.5 h-0.5 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+                                        <div className="absolute bottom-4 right-3 w-0.5 h-0.5 bg-yellow-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
                                     </div>
                                 </div>
                             </div>

@@ -5,58 +5,47 @@ import WaveText from "@/components/WaveText"
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import HoverImage from "@/components/HoverImage"
 import ProjectModal from "@/components/ProjectModal"
-import myPic from '@/assets/img/my-pic.jpg';
-import myPicGibly from '@/assets/img/my-pic-gibly.png';
 import { ExternalLink } from 'lucide-react';
 import { StaticImageData } from 'next/image';
+
+
+import portfolioV1 from '@/assets/img/portfolio-v1-2.png';
+import portfolioV1Hover from '@/assets/img/portfolio-v1-1.png';
+import theIntellectualist from '@/assets/img/theintellectualist-1.png';
+import theIntellectualistHover from '@/assets/img/theintellectualist-2.png';
 
 interface Project {
     id: number
     title: string
     description: string
-    emoji: string
     gradient: string
     tags: string[]
     url?: string
-    images?: (string | StaticImageData)[]
+    images?: (string | StaticImageData)[],
+    cardImg: StaticImageData,
+    cardHoverImg: StaticImageData,
 }
 
 const projects: Project[] = [
     {
         id: 1,
-        title: '3D E-Commerce Platform',
-        description: 'Interactive 3D product visualization with WebGL and Three.js',
-        emoji: '🌐',
+        title: 'Portfolio v1',
+        description: 'This portfolio was created since 2013.',
         gradient: 'from-purple-600 to-pink-600',
-        tags: ['React', 'Three.js', 'WebGL'],
-        images: [
-            myPic,
-            myPicGibly,
-            myPic,
-            myPicGibly
-        ]
+        tags: ['AngularJS'],
+        url: 'https://vrigzalejo.github.io',
+        cardImg: portfolioV1,
+        cardHoverImg: portfolioV1Hover,
     },
     {
         id: 2,
-        title: 'Interactive Game Engine',
-        description: 'Browser-based game engine with physics simulation',
-        emoji: '🎮',
+        title: 'The Intellectualist',
+        description: 'This is a CMS site.',
         gradient: 'from-blue-600 to-cyan-600',
-        tags: ['TypeScript', 'Canvas API', 'Physics'],
-        url: 'https://example.com/game-engine'
-    },
-    {
-        id: 3,
-        title: 'Data Visualization Dashboard',
-        description: 'Real-time 3D data visualization with D3.js integration',
-        emoji: '📊',
-        gradient: 'from-green-600 to-teal-600',
-        tags: ['Vue.js', 'D3.js', 'WebSockets'],
-        images: [
-            myPicGibly,
-            myPic,
-            myPicGibly
-        ]
+        tags: ['WordPress', 'AWS', 'Cloudflare'],
+        url: 'https://theintellectualist.com',
+        cardImg: theIntellectualist,
+        cardHoverImg: theIntellectualistHover,
     }
 ]
 
@@ -103,8 +92,8 @@ export default function ProjectsSection() {
                                 <div key={project.id} className="glass-effect p-6 rounded-2xl shadow-lg">
                                     <div className="mb-6">
                                         <HoverImage
-                                            primaryImage={myPicGibly}
-                                            hoverImage={myPic}
+                                            primaryImage={project.cardImg}
+                                            hoverImage={project.cardHoverImg}
                                             title={title}
                                             clipPathAnimation="oval"
                                             size="xl"
