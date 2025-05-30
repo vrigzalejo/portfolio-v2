@@ -554,72 +554,72 @@ export default function SkillsSection() {
                     {/* Title positioned absolutely at the top */}
                     <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
 
-                    {/* Ultra Cool Drag Notification - Repositioned to top-right */}
+                    {/* Ultra Cool Drag Notification - Light/Dark Mode Variants */}
                     {showDragIndicator && (
                         <div className="absolute top-8 right-8 z-10">
                             <div
                                 className="relative group cursor-pointer"
                                 onClick={handleNotificationClick}
                             >
-                                {/* Outer glow ring */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-full blur-xl opacity-75 animate-pulse scale-110"></div>
+                                {/* Outer glow ring - Different colors for light/dark */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 dark:from-cyan-300 dark:via-purple-400 dark:to-pink-400 rounded-full blur-xl opacity-75 dark:opacity-60 animate-pulse scale-110"></div>
 
-                                {/* Main notification body */}
-                                <div className="relative bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 text-white px-6 py-3 rounded-2xl shadow-2xl border border-purple-500/30 backdrop-blur-sm">
-                                    {/* Animated border */}
-                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 p-0.5">
-                                        <div className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 rounded-2xl w-full h-full"></div>
+                                {/* Main notification body - Responsive backgrounds */}
+                                <div className="relative bg-gradient-to-r from-white via-gray-50 to-white dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 text-gray-800 dark:text-white px-6 py-3 rounded-2xl shadow-2xl border border-purple-200 dark:border-purple-500/30 backdrop-blur-sm">
+                                    {/* Animated border - Adjusted opacity for light mode */}
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 dark:from-cyan-300 dark:via-purple-400 dark:to-pink-400 p-0.5 opacity-60 dark:opacity-100">
+                                        <div className="bg-gradient-to-r from-white via-gray-50 to-white dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 rounded-2xl w-full h-full"></div>
                                     </div>
 
                                     {/* Content */}
                                     <div className="relative flex items-center space-x-3">
                                         {/* Rotating drag icon */}
                                         <div className="relative">
-                                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 flex items-center justify-center animate-spin" style={{ animationDuration: '3s' }}>
+                                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 dark:from-cyan-400 dark:to-purple-500 flex items-center justify-center animate-spin" style={{ animationDuration: '3s' }}>
                                                 <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a4 4 0 00-2 7.5V15a1 1 0 01-2 0v-2.5a4 4 0 000-7V5a1 1 0 112 0v.5z" clipRule="evenodd" />
                                                 </svg>
                                             </div>
-                                            {/* Orbiting dots */}
+                                            {/* Orbiting dots - Brighter colors for light mode */}
                                             <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
-                                                <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full absolute -top-0.5 left-1/2 transform -translate-x-1/2"></div>
-                                                <div className="w-1.5 h-1.5 bg-pink-400 rounded-full absolute -bottom-0.5 left-1/2 transform -translate-x-1/2"></div>
-                                                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full absolute top-1/2 -left-0.5 transform -translate-y-1/2"></div>
-                                                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full absolute top-1/2 -right-0.5 transform -translate-y-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-cyan-500 dark:bg-cyan-400 rounded-full absolute -top-0.5 left-1/2 transform -translate-x-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-pink-500 dark:bg-pink-400 rounded-full absolute -bottom-0.5 left-1/2 transform -translate-x-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-purple-500 dark:bg-purple-400 rounded-full absolute top-1/2 -left-0.5 transform -translate-y-1/2"></div>
+                                                <div className="w-1.5 h-1.5 bg-yellow-500 dark:bg-yellow-400 rounded-full absolute top-1/2 -right-0.5 transform -translate-y-1/2"></div>
                                             </div>
                                         </div>
 
-                                        {/* Text content - Condensed */}
+                                        {/* Text content - Responsive colors */}
                                         <div className="flex flex-col">
                                             <div className="flex items-center space-x-2 mb-0.5">
-                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-bold text-base">
+                                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-purple-700 dark:from-cyan-400 dark:to-purple-400 font-bold text-base">
                                                     Interactive 3D Skills
                                                 </span>
                                             </div>
-                                            <div className="text-gray-300 text-xs flex items-center space-x-1.5">
+                                            <div className="text-gray-600 dark:text-gray-300 text-xs flex items-center space-x-1.5">
                                                 <span>🖱️ Drag</span>
-                                                <span className="text-purple-400">•</span>
+                                                <span className="text-purple-500 dark:text-purple-400">•</span>
                                                 <span>👆 Click</span>
-                                                <span className="text-purple-400">•</span>
-                                                <span className="text-cyan-400">✨ Hover</span>
+                                                <span className="text-purple-500 dark:text-purple-400">•</span>
+                                                <span className="text-cyan-600 dark:text-cyan-400">✨ Hover</span>
                                             </div>
                                         </div>
 
-                                        {/* Close button */}
+                                        {/* Close button - Light/dark variants */}
                                         <div className="ml-2 opacity-60 hover:opacity-100 transition-opacity">
-                                            <div className="w-5 h-5 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold hover:scale-110 transition-transform">
+                                            <div className="w-5 h-5 rounded-full bg-gradient-to-r from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400 flex items-center justify-center text-white text-xs font-bold hover:scale-110 transition-transform">
                                                 ×
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Floating particles */}
+                                    {/* Floating particles - Stronger colors for light mode */}
                                     <div className="absolute inset-0 pointer-events-none">
-                                        <div className="absolute top-1 left-3 w-0.5 h-0.5 bg-cyan-400 rounded-full animate-ping" style={{ animationDelay: '0s' }}></div>
-                                        <div className="absolute top-4 right-6 w-0.5 h-0.5 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
-                                        <div className="absolute bottom-2 left-8 w-0.5 h-0.5 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
-                                        <div className="absolute bottom-4 right-3 w-0.5 h-0.5 bg-yellow-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                                        <div className="absolute top-1 left-3 w-0.5 h-0.5 bg-cyan-500 dark:bg-cyan-400 rounded-full animate-ping" style={{ animationDelay: '0s' }}></div>
+                                        <div className="absolute top-4 right-6 w-0.5 h-0.5 bg-purple-500 dark:bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+                                        <div className="absolute bottom-2 left-8 w-0.5 h-0.5 bg-pink-500 dark:bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+                                        <div className="absolute bottom-4 right-3 w-0.5 h-0.5 bg-yellow-500 dark:bg-yellow-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
                                     </div>
                                 </div>
                             </div>
