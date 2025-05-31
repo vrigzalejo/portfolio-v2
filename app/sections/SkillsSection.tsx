@@ -47,7 +47,7 @@ const skills: Skill[] = [
     { name: 'Netlify', color: '#00c7b7' },
     { name: 'Python', color: '#3776ab' },
 ];
- 
+
 
 const title = '⚡ Skills & Technologies'
 
@@ -61,14 +61,15 @@ export default function SkillsSection() {
     const [showDragIndicator, setShowDragIndicator] = useState(true)
     const [hasInteracted, setHasInteracted] = useState(false)
 
-    // Mouse drag state
+    // Mouse/Touch drag state
     const dragStateRef = useRef({
         isDragging: false,
         previousMousePosition: { x: 0, y: 0 },
         rotation: { x: 0, y: 0 },
         velocity: { x: 0, y: 0 },
         damping: 0.95,
-        autoRotate: true
+        autoRotate: true,
+        isTouch: false // Track if we're using touch
     })
 
     // Create skill spheres data
@@ -109,6 +110,15 @@ export default function SkillsSection() {
     const handleNotificationClick = () => {
         setShowDragIndicator(false)
         setHasInteracted(true)
+    }
+
+    // Get normalized coordinates for both mouse and touch
+    const getNormalizedCoordinates = (clientX: number, clientY: number, renderer: THREE.WebGLRenderer) => {
+        const rect = renderer.domElement.getBoundingClientRect()
+        return {
+            x: ((clientX - rect.left) / rect.width) * 2 - 1,
+            y: -((clientY - rect.top) / rect.height) * 2 + 1
+        }
     }
 
     useEffect(() => {
@@ -281,11 +291,12 @@ export default function SkillsSection() {
             createTextMesh(skillData.name, skillData, index)
         })
 
-        // Mouse drag functionality
+        // MOUSE EVENT HANDLERS
         const handleMouseDown = (event: MouseEvent) => {
             handleUserInteraction()
             dragStateRef.current.isDragging = true
             dragStateRef.current.autoRotate = false
+            dragStateRef.current.isTouch = false
             dragStateRef.current.previousMousePosition = {
                 x: event.clientX,
                 y: event.clientY
@@ -294,11 +305,11 @@ export default function SkillsSection() {
         }
 
         const handleMouseMove = (event: MouseEvent) => {
-            const rect = renderer.domElement.getBoundingClientRect()
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+            const normalizedCoords = getNormalizedCoordinates(event.clientX, event.clientY, renderer)
+            mouse.x = normalizedCoords.x
+            mouse.y = normalizedCoords.y
 
-            if (dragStateRef.current.isDragging) {
+            if (dragStateRef.current.isDragging && !dragStateRef.current.isTouch) {
                 const deltaMove = {
                     x: event.clientX - dragStateRef.current.previousMousePosition.x,
                     y: event.clientY - dragStateRef.current.previousMousePosition.y
@@ -320,7 +331,7 @@ export default function SkillsSection() {
                 }
 
                 document.body.style.cursor = 'grabbing'
-            } else {
+            } else if (!dragStateRef.current.isDragging) {
                 // Handle hover effects when not dragging
                 raycaster.setFromCamera(mouse, camera)
                 const intersects = raycaster.intersectObjects(textMeshes)
@@ -350,7 +361,7 @@ export default function SkillsSection() {
         }
 
         const handleMouseUp = () => {
-            if (dragStateRef.current.isDragging) {
+            if (dragStateRef.current.isDragging && !dragStateRef.current.isTouch) {
                 dragStateRef.current.isDragging = false
                 document.body.style.cursor = 'grab'
 
@@ -368,9 +379,9 @@ export default function SkillsSection() {
             // Only handle clicks if not dragging
             if (dragStateRef.current.isDragging) return
 
-            const rect = renderer.domElement.getBoundingClientRect()
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+            const normalizedCoords = getNormalizedCoordinates(event.clientX, event.clientY, renderer)
+            mouse.x = normalizedCoords.x
+            mouse.y = normalizedCoords.y
 
             raycaster.setFromCamera(mouse, camera)
             const intersects = raycaster.intersectObjects(textMeshes)
@@ -400,17 +411,118 @@ export default function SkillsSection() {
             }
         }
 
-        // Add event listeners
+        // TOUCH EVENT HANDLERS
+        const handleTouchStart = (event: TouchEvent) => {
+            event.preventDefault() // Prevent scrolling
+            handleUserInteraction()
+
+            if (event.touches.length === 1) {
+                const touch = event.touches[0]
+                dragStateRef.current.isDragging = true
+                dragStateRef.current.autoRotate = false
+                dragStateRef.current.isTouch = true
+                dragStateRef.current.previousMousePosition = {
+                    x: touch.clientX,
+                    y: touch.clientY
+                }
+            }
+        }
+
+        const handleTouchMove = (event: TouchEvent) => {
+            event.preventDefault() // Prevent scrolling
+
+            if (event.touches.length === 1 && dragStateRef.current.isDragging && dragStateRef.current.isTouch) {
+                const touch = event.touches[0]
+                const normalizedCoords = getNormalizedCoordinates(touch.clientX, touch.clientY, renderer)
+                mouse.x = normalizedCoords.x
+                mouse.y = normalizedCoords.y
+
+                const deltaMove = {
+                    x: touch.clientX - dragStateRef.current.previousMousePosition.x,
+                    y: touch.clientY - dragStateRef.current.previousMousePosition.y
+                }
+
+                // Convert touch movement to rotation (slightly more sensitive for touch)
+                const rotationSpeed = 0.007
+                dragStateRef.current.velocity.x = deltaMove.y * rotationSpeed
+                dragStateRef.current.velocity.y = deltaMove.x * rotationSpeed
+
+                // Apply rotation to text group
+                dragStateRef.current.rotation.x += dragStateRef.current.velocity.x
+                dragStateRef.current.rotation.y += dragStateRef.current.velocity.y
+
+                // Update previous touch position
+                dragStateRef.current.previousMousePosition = {
+                    x: touch.clientX,
+                    y: touch.clientY
+                }
+            }
+        }
+
+        const handleTouchEnd = (event: TouchEvent) => {
+            event.preventDefault()
+
+            if (dragStateRef.current.isDragging && dragStateRef.current.isTouch) {
+                // Handle tap for click effect
+                if (event.changedTouches.length === 1) {
+                    const touch = event.changedTouches[0]
+                    const normalizedCoords = getNormalizedCoordinates(touch.clientX, touch.clientY, renderer)
+                    mouse.x = normalizedCoords.x
+                    mouse.y = normalizedCoords.y
+
+                    raycaster.setFromCamera(mouse, camera)
+                    const intersects = raycaster.intersectObjects(textMeshes)
+
+                    if (intersects.length > 0) {
+                        const sprite = intersects[0].object
+                        // Enhanced tap animation with elastic effect
+                        if (sprite.userData && sprite.userData.originalScale) {
+                            const originalScale = sprite.userData.originalScale.clone()
+
+                            // Immediate scale down
+                            sprite.userData.targetScale.copy(originalScale)
+                            sprite.userData.targetScale.multiplyScalar(0.5)
+
+                            setTimeout(() => {
+                                // Scale up beyond target - more dramatic effect
+                                sprite.userData.targetScale.copy(originalScale)
+                                sprite.userData.targetScale.multiplyScalar(2.5)
+
+                                setTimeout(() => {
+                                    // Return to normal state
+                                    sprite.userData.targetScale.copy(originalScale)
+                                }, 150)
+                            }, 100)
+                        }
+                    }
+                }
+
+                dragStateRef.current.isDragging = false
+
+                // Resume auto-rotation after a delay if user stops interacting
+                setTimeout(() => {
+                    if (!dragStateRef.current.isDragging) {
+                        dragStateRef.current.autoRotate = true
+                    }
+                }, 3000)
+            }
+        }
+
+        // Add mouse event listeners
         renderer.domElement.addEventListener('mousedown', handleMouseDown)
         renderer.domElement.addEventListener('mousemove', handleMouseMove)
         renderer.domElement.addEventListener('mouseup', handleMouseUp)
         renderer.domElement.addEventListener('click', handleClick)
-
-        // Handle mouse leave to stop dragging
         renderer.domElement.addEventListener('mouseleave', handleMouseUp)
+
+        // Add touch event listeners
+        renderer.domElement.addEventListener('touchstart', handleTouchStart, { passive: false })
+        renderer.domElement.addEventListener('touchmove', handleTouchMove, { passive: false })
+        renderer.domElement.addEventListener('touchend', handleTouchEnd, { passive: false })
 
         // Set initial cursor
         renderer.domElement.style.cursor = 'grab'
+        renderer.domElement.style.touchAction = 'none' // Prevent default touch behaviors
 
         // Animation loop with smooth transitions
         const animate = () => {
@@ -504,11 +616,18 @@ export default function SkillsSection() {
             }
 
             window.removeEventListener('resize', handleResize)
+
+            // Remove mouse event listeners
             renderer.domElement.removeEventListener('mousedown', handleMouseDown)
             renderer.domElement.removeEventListener('mousemove', handleMouseMove)
             renderer.domElement.removeEventListener('mouseup', handleMouseUp)
             renderer.domElement.removeEventListener('click', handleClick)
             renderer.domElement.removeEventListener('mouseleave', handleMouseUp)
+
+            // Remove touch event listeners
+            renderer.domElement.removeEventListener('touchstart', handleTouchStart)
+            renderer.domElement.removeEventListener('touchmove', handleTouchMove)
+            renderer.domElement.removeEventListener('touchend', handleTouchEnd)
 
             if (mountRef.current && renderer.domElement) {
                 mountRef.current.removeChild(renderer.domElement)
@@ -554,7 +673,7 @@ export default function SkillsSection() {
                     {/* Title positioned absolutely at the top */}
                     <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
 
-                    {/* Ultra Cool Drag Notification - Light/Dark Mode Variants */}
+                    {/* Ultra Cool Drag Notification - Updated for touch devices */}
                     {showDragIndicator && (
                         <div className="absolute top-8 right-8 z-10">
                             <div
