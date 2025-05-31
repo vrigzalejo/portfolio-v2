@@ -7,6 +7,8 @@ import { ClipPathBorders } from "../components/ClipPathBorders"
 import ContactModal from '@/components/ContactModal'
 import Link from 'next/link';
 import TypewriterGlow from '@/components/TypewriterGlow';
+import * as gtag from '@/lib/gtag'
+import { toSlug } from '@/lib/utils';
 
 interface ContactMethod {
     icon: React.ReactElement;
@@ -28,6 +30,14 @@ const title = '📧 Let\'s Work Together'
 
 export default function ContactSection() {
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const handleClick = (title: string) => {
+        gtag.event({
+            action: 'click',
+            category: 'link',
+            label: toSlug(title),
+            value: 1,
+        })
+    }
 
     return (
         <>
@@ -40,7 +50,7 @@ export default function ContactSection() {
                             <TypewriterGlow className="mb-10" textSize="text-xl sm:text-2xl md:text-2xl lg:text-2xl" texts={texts}/>
                             <div className="grid md:grid-cols-2 gap-8 mb-12">
                                 {contactMethods.map((method, index) => (
-                                    <Link key={index} href={method.url} target="_blank" rel="noopener noreferrer">
+                                    <Link key={index} href={method.url} onClick={() => handleClick(method.title)} target="_blank" rel="noopener noreferrer">
                                         <div key={index} className="glass-effect shadow-lg text-gray-900 dark:text-white p-6 rounded-2xl flex flex-col items-center justify-center">
                                             <div className="text-3xl mb-4">{method.icon}</div>
                                             <h3 className="font-semibold mb-2">{method.title}</h3>

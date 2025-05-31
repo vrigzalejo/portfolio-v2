@@ -3,6 +3,7 @@
 import Script from 'next/script'
 import { useState } from 'react'
 import { X, Send, Loader2 } from 'lucide-react'
+import * as gtag from '@/lib/gtag'
 
 declare global {
     interface Window {
@@ -36,7 +37,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
     const [errors, setErrors] = useState<Partial<FormData>>({})
-    const RECAPTCHA_SITE_KEY = "6LfJUEkrAAAAAGuysyOnJkhah4yYBrzuTl5VFBBz";
+    const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''
 
     const validateForm = (): boolean => {
         const newErrors: Partial<FormData> = {}
@@ -58,6 +59,13 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
         e.preventDefault()
 
         if (!validateForm()) return
+
+        gtag.event({
+            action: 'click',
+            category: 'button',
+            label: 'contact_form_submit',
+            value: '1',
+        })
 
         setIsSubmitting(true)
         setSubmitStatus('idle')

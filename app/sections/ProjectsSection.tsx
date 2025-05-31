@@ -7,12 +7,13 @@ import HoverImage from "@/components/HoverImage"
 import ProjectModal from "@/components/ProjectModal"
 import { ExternalLink } from 'lucide-react';
 import { StaticImageData } from 'next/image';
-
+import * as gtag from '@/lib/gtag'
 
 import portfolioV1 from '@/assets/img/portfolio-v1-2.png';
 import portfolioV1Hover from '@/assets/img/portfolio-v1-1.png';
 import theIntellectualist from '@/assets/img/theintellectualist-1.png';
 import theIntellectualistHover from '@/assets/img/theintellectualist-2.png';
+import { toSlug } from '@/lib/utils'
 
 interface Project {
     id: number
@@ -57,6 +58,13 @@ export default function ProjectsSection() {
 
     const handleViewProject = (project: Project) => {
         if (project.url) {
+            gtag.event({
+                action: 'click',
+                category: 'link',
+                label: toSlug(project.title),
+                value: 1,
+            })
+
             window.open(project.url, '_blank')
         } else if (project.images && project.images.length > 0) {
             setSelectedProject(project)
