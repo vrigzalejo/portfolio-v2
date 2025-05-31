@@ -413,25 +413,40 @@ export default function SkillsSection() {
 
         // TOUCH EVENT HANDLERS
         const handleTouchStart = (event: TouchEvent) => {
-            event.preventDefault() // Prevent scrolling
             handleUserInteraction()
 
             if (event.touches.length === 1) {
                 const touch = event.touches[0]
-                dragStateRef.current.isDragging = true
-                dragStateRef.current.autoRotate = false
-                dragStateRef.current.isTouch = true
-                dragStateRef.current.previousMousePosition = {
-                    x: touch.clientX,
-                    y: touch.clientY
+                const normalizedCoords = getNormalizedCoordinates(touch.clientX, touch.clientY, renderer)
+                mouse.x = normalizedCoords.x
+                mouse.y = normalizedCoords.y
+
+                // Check if touch is directly on a 3D text element
+                raycaster.setFromCamera(mouse, camera)
+                const intersects = raycaster.intersectObjects(textMeshes)
+
+                if (intersects.length > 0) {
+                    // Only prevent default and enable dragging if directly touching 3D text
+                    event.preventDefault()
+                    event.stopPropagation()
+                    dragStateRef.current.isDragging = true
+                    dragStateRef.current.autoRotate = false
+                    dragStateRef.current.isTouch = true
+                    dragStateRef.current.previousMousePosition = {
+                        x: touch.clientX,
+                        y: touch.clientY
+                    }
                 }
+                // If not touching text directly, allow normal page scrolling
             }
         }
 
         const handleTouchMove = (event: TouchEvent) => {
-            event.preventDefault() // Prevent scrolling
-
             if (event.touches.length === 1 && dragStateRef.current.isDragging && dragStateRef.current.isTouch) {
+                // Only prevent scrolling when actively dragging 3D text
+                event.preventDefault()
+                event.stopPropagation()
+
                 const touch = event.touches[0]
                 const normalizedCoords = getNormalizedCoordinates(touch.clientX, touch.clientY, renderer)
                 mouse.x = normalizedCoords.x
@@ -442,7 +457,7 @@ export default function SkillsSection() {
                     y: touch.clientY - dragStateRef.current.previousMousePosition.y
                 }
 
-                // Convert touch movement to rotation (slightly more sensitive for touch)
+                // Convert touch movement to rotation
                 const rotationSpeed = 0.007
                 dragStateRef.current.velocity.x = deltaMove.y * rotationSpeed
                 dragStateRef.current.velocity.y = deltaMove.x * rotationSpeed
@@ -457,12 +472,14 @@ export default function SkillsSection() {
                     y: touch.clientY
                 }
             }
+        // Otherwise allow normal scrolling
         }
 
         const handleTouchEnd = (event: TouchEvent) => {
-            event.preventDefault()
-
             if (dragStateRef.current.isDragging && dragStateRef.current.isTouch) {
+                event.preventDefault()
+                event.stopPropagation()
+
                 // Handle tap for click effect
                 if (event.changedTouches.length === 1) {
                     const touch = event.changedTouches[0]
@@ -475,21 +492,17 @@ export default function SkillsSection() {
 
                     if (intersects.length > 0) {
                         const sprite = intersects[0].object
-                        // Enhanced tap animation with elastic effect
                         if (sprite.userData && sprite.userData.originalScale) {
                             const originalScale = sprite.userData.originalScale.clone()
 
-                            // Immediate scale down
                             sprite.userData.targetScale.copy(originalScale)
                             sprite.userData.targetScale.multiplyScalar(0.5)
 
                             setTimeout(() => {
-                                // Scale up beyond target - more dramatic effect
                                 sprite.userData.targetScale.copy(originalScale)
                                 sprite.userData.targetScale.multiplyScalar(2.5)
 
                                 setTimeout(() => {
-                                    // Return to normal state
                                     sprite.userData.targetScale.copy(originalScale)
                                 }, 150)
                             }, 100)
@@ -499,7 +512,6 @@ export default function SkillsSection() {
 
                 dragStateRef.current.isDragging = false
 
-                // Resume auto-rotation after a delay if user stops interacting
                 setTimeout(() => {
                     if (!dragStateRef.current.isDragging) {
                         dragStateRef.current.autoRotate = true
@@ -516,13 +528,12 @@ export default function SkillsSection() {
         renderer.domElement.addEventListener('mouseleave', handleMouseUp)
 
         // Add touch event listeners
-        renderer.domElement.addEventListener('touchstart', handleTouchStart, { passive: false })
-        renderer.domElement.addEventListener('touchmove', handleTouchMove, { passive: false })
-        renderer.domElement.addEventListener('touchend', handleTouchEnd, { passive: false })
+        renderer.domElement.addEventListener('touchstart', handleTouchStart)
+        renderer.domElement.addEventListener('touchmove', handleTouchMove)
+        renderer.domElement.addEventListener('touchend', handleTouchEnd)
 
         // Set initial cursor
         renderer.domElement.style.cursor = 'grab'
-        renderer.domElement.style.touchAction = 'none' // Prevent default touch behaviors
 
         // Animation loop with smooth transitions
         const animate = () => {
