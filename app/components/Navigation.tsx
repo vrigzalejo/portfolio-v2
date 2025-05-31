@@ -53,27 +53,27 @@ export default function Navigation() {
           <div className="flex items-center space-x-4">
             <div className={`text-3xl font-bold ${styles.logo}`}>
               <Link href="#home">
-                <HoverImage 
-                  primaryImage={myPic} 
-                  hoverImage={gravatarUrl} 
-                  title="Avatar" 
-                  clipPathAnimation="oval" 
+                <HoverImage
+                  primaryImage={myPic}
+                  hoverImage={gravatarUrl}
+                  title="Avatar"
+                  clipPathAnimation="oval"
                   size='xs'
-                  />
+                />
               </Link>
             </div>
             <ThemeToggle />
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-1">
+          {/* Desktop Navigation - Only show on xl screens (1280px+) */}
+          <div className="hidden xl:flex space-x-1">
             {navItems.map((item) => (
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
                 className={`${styles.navItem} px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${activeSection === item.href
-                    ? styles.activeItem
-                    : 'dark:text-slate-300 text-slate-900 hover:text-purple-400'
+                  ? styles.activeItem
+                  : 'dark:text-slate-300 text-slate-900 hover:text-purple-400'
                   }`}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -82,10 +82,10 @@ export default function Navigation() {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Show on all screens below xl (1280px) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden"
+            className="xl:hidden"
             aria-label="Toggle mobile menu"
           >
             <div className={`${styles.hamburger} ${isMobileMenuOpen ? styles.open : ''}`}>
@@ -96,16 +96,16 @@ export default function Navigation() {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Show on all screens below xl (1280px) */}
         {isMobileMenuOpen && (
-          <div className={`md:hidden ${styles.mobileMenu} ${styles.slideDown}`}>
+          <div className={`xl:hidden ${styles.mobileMenu} ${styles.slideDown}`}>
             <div className="px-4 py-6 space-y-1">
               {navItems.map((item) => (
                 <button
                   key={item.href}
                   onClick={() => handleNavClick(item.href)}
                   className={`${styles.mobileNavItem} w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-3 ${activeSection === item.href
-                      ? 'text-purple-400 bg-purple-500/10 border-l-purple-400'
+                    ? 'text-purple-400 bg-purple-500/10 border-l-purple-400'
                     : 'dark:text-slate-300 text-slate-900  hover:text-purple-400'
                     }`}
                 >
