@@ -13,6 +13,8 @@ import portfolioV1 from '@/assets/img/portfolio-v1-2.png';
 import portfolioV1Hover from '@/assets/img/portfolio-v1-1.png';
 import theIntellectualist from '@/assets/img/theintellectualist-1.png';
 import theIntellectualistHover from '@/assets/img/theintellectualist-2.png';
+import esportsTracker from '@/assets/img/esports-tracker-2.png';
+import esportsTrackerHover from '@/assets/img/esports-tracker-1.png';
 import { toSlug } from '@/lib/utils'
 
 interface Project {
@@ -41,12 +43,22 @@ const projects: Project[] = [
     {
         id: 2,
         title: 'The Intellectualist',
-        description: 'This is a CMS site.',
+        description: 'A powerful CMS site that\'s built for thinkers, creators, and visionaries looking to share knowledge seamlessly. ',
         gradient: 'from-blue-600 to-cyan-600',
         tags: ['WordPress', 'AWS', 'Cloudflare'],
         url: 'https://theintellectualist.com',
         cardImg: theIntellectualist,
         cardHoverImg: theIntellectualistHover,
+    },
+    {
+        id: 3,
+        title: 'Esports Tracker',
+        description: 'The ultimate tool for analyzing performance, tracking stats, and staying ahead in the competitive gaming arena.',
+        gradient: 'from-blue-600 to-cyan-600',
+        tags: ['NextJS', 'Tailwind', 'Typescript', 'Vercel', 'PandaScore API'],
+        url: 'https://esports-tracker-2u9loepgt-brigido-alejos-projects.vercel.app/',
+        cardImg: esportsTracker,
+        cardHoverImg: esportsTrackerHover,
     }
 ]
 
