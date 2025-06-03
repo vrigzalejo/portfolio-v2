@@ -56,7 +56,7 @@ const projects: Project[] = [
         description: 'The ultimate tool for analyzing performance, tracking stats, and staying ahead in the competitive gaming arena.',
         gradient: 'from-blue-600 to-cyan-600',
         tags: ['NextJS', 'Tailwind', 'Typescript', 'Vercel', 'PandaScore API'],
-        url: 'https://esports-tracker-2u9loepgt-brigido-alejos-projects.vercel.app/',
+        url: 'https://esports-tracker-three.vercel.app',
         cardImg: esportsTracker,
         cardHoverImg: esportsTrackerHover,
     }
