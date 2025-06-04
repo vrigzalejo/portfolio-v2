@@ -32,6 +32,16 @@ interface Project {
 const projects: Project[] = [
     {
         id: 1,
+        title: 'Esports Tracker',
+        description: 'The ultimate tool for analyzing performance, tracking stats, and staying ahead in the competitive gaming arena.',
+        gradient: 'from-blue-600 to-cyan-600',
+        tags: ['NextJS', 'Tailwind', 'Typescript', 'Vercel', 'PandaScore API'],
+        url: 'https://esports-tracker-three.vercel.app',
+        cardImg: esportsTracker,
+        cardHoverImg: esportsTrackerHover,
+    },
+    {
+        id: 2,
         title: 'Portfolio v1',
         description: 'This portfolio was created since 2013.',
         gradient: 'from-purple-600 to-pink-600',
@@ -41,7 +51,7 @@ const projects: Project[] = [
         cardHoverImg: portfolioV1Hover,
     },
     {
-        id: 2,
+        id: 3,
         title: 'The Intellectualist',
         description: 'A powerful CMS site that\'s built for thinkers, creators, and visionaries looking to share knowledge seamlessly. ',
         gradient: 'from-blue-600 to-cyan-600',
@@ -49,16 +59,6 @@ const projects: Project[] = [
         url: 'https://theintellectualist.com',
         cardImg: theIntellectualist,
         cardHoverImg: theIntellectualistHover,
-    },
-    {
-        id: 3,
-        title: 'Esports Tracker',
-        description: 'The ultimate tool for analyzing performance, tracking stats, and staying ahead in the competitive gaming arena.',
-        gradient: 'from-blue-600 to-cyan-600',
-        tags: ['NextJS', 'Tailwind', 'Typescript', 'Vercel', 'PandaScore API'],
-        url: 'https://esports-tracker-three.vercel.app',
-        cardImg: esportsTracker,
-        cardHoverImg: esportsTrackerHover,
     }
 ]
 
