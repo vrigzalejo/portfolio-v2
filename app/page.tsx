@@ -22,8 +22,8 @@ export default function Home() {
         <ContactSection />
       </main>
       <footer className="py-8 px-4 border-t border-gray-800 glass-effect shadow-[0px_10px_30px_rgba(0,0,0,0.3)]">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-900 dark:text-white font-bold">© {new Date().getFullYear()} Made with ❤️ by Brigido Alejo</p>
+        <div className="max-w-6xl mx-auto flex flex-col items-center gap-4">
+          <p className="text-gray-900 dark:text-white font-bold text-center">© {new Date().getFullYear()} Made with ❤️ by Brigido Alejo</p>
           <Link 
             href="https://coff.ee/brigsalejoq" 
             target="_blank" 
