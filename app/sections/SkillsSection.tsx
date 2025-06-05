@@ -680,19 +680,13 @@ export default function SkillsSection() {
     return (
         <ClipPathBorders>
             <section id="skills" className="section-bg relative">
-                <div className="max-w-6xl mx-auto relative">
-                    {/* Title positioned behind the 3D scene */}
-                    <div className="absolute top-0 left-0 right-0 z-30 flex justify-center">
-                        <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
-                    </div>
-
-                    {/* Ultra Cool Drag Notification - Updated for touch devices */}
-                    {showDragIndicator && (
-                        <div className="absolute top-8 right-8 z-20">
-                            <div
-                                className="relative group cursor-pointer"
-                                onClick={handleNotificationClick}
-                            >
+                {/* Ultra Cool Drag Notification - Updated for touch devices */}
+                {showDragIndicator && (
+                    <div className="absolute right-4 z-60">
+                        <div
+                            className="relative group cursor-pointer"
+                            onClick={handleNotificationClick}
+                        >
                                 {/* Outer glow ring - Different colors for light/dark */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 dark:from-cyan-300 dark:via-purple-400 dark:to-pink-400 rounded-full blur-xl opacity-75 dark:opacity-60 animate-pulse scale-110"></div>
 
@@ -757,6 +751,12 @@ export default function SkillsSection() {
                             </div>
                         </div>
                     )}
+
+                <div className="max-w-6xl mx-auto relative">
+                    {/* Title positioned behind the 3D scene */}
+                    <div className="absolute top-0 left-0 right-0 z-30 flex justify-center">
+                        <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
+                    </div>
 
                     <div className="flex justify-center items-center relative z-10">
                         {/* 3D Scene Container - Full screen */}
