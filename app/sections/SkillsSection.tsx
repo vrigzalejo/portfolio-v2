@@ -5,6 +5,138 @@ import * as THREE from 'three'
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import WaveText from '@/components/WaveText'
 
+// Device performance detection
+const detectDevicePerformance = (): 'low' | 'medium' | 'high' => {
+    // Return default for SSR
+    if (typeof window === 'undefined' || typeof document === 'undefined' || typeof navigator === 'undefined') {
+        return 'medium'
+    }
+
+    try {
+        const canvas = document.createElement('canvas')
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as WebGLRenderingContext | null
+        
+        if (!gl) return 'low'
+        
+        const renderer = gl.getParameter(gl.RENDERER) || ''
+        const cores = navigator.hardwareConcurrency || 4
+        const memory = (navigator as any).deviceMemory || 4 // eslint-disable-line @typescript-eslint/no-explicit-any
+        
+        // Check for mobile devices
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        
+        // Performance scoring
+        let score = 0
+        
+        // CPU cores
+        if (cores >= 8) score += 3
+        else if (cores >= 4) score += 2
+        else score += 1
+        
+        // Memory
+        if (memory >= 8) score += 3
+        else if (memory >= 4) score += 2
+        else score += 1
+        
+        // GPU detection (basic)
+        const gpuTier = renderer.toLowerCase()
+        if (gpuTier.includes('nvidia') || gpuTier.includes('amd') || gpuTier.includes('radeon')) {
+            if (gpuTier.includes('rtx') || gpuTier.includes('rx')) score += 3
+            else score += 2
+        } else if (gpuTier.includes('intel')) {
+            score += 1
+        } else {
+            score += 1
+        }
+        
+        // Mobile penalty
+        if (isMobile) score -= 2
+        
+        // Determine performance tier
+        if (score >= 7) return 'high'
+        else if (score >= 4) return 'medium'
+        else return 'low'
+    } catch (error) {
+        console.warn('Device performance detection failed:', error)
+        return 'medium'
+    }
+}
+
+type PerformanceTier = 'low' | 'medium' | 'high'
+
+interface PerformanceConfig {
+    skillCount: number
+    canvasResolution: number // Minimum canvas size, will expand for longer text
+    fontSize: number
+    glowLayers: number
+    animationSpeed: number
+    pixelRatio: number
+    antialias: boolean
+    enableFloating: boolean
+    enableCameraMovement: boolean
+    enableAdvancedLighting: boolean
+    updateFrequency: number
+    textureQuality: {
+        minFilter: THREE.MinificationTextureFilter
+        magFilter: THREE.MagnificationTextureFilter
+    }
+}
+
+// Performance configurations
+const PERFORMANCE_CONFIGS: Record<PerformanceTier, PerformanceConfig> = {
+    low: {
+        skillCount: 35, // Keep all skills
+        canvasResolution: 128, // Much smaller canvas
+        fontSize: 60, // Smaller font
+        glowLayers: 2, // Minimal glow
+        animationSpeed: 0.3, // Slower animations
+        pixelRatio: 1,
+        antialias: false,
+        enableFloating: false,
+        enableCameraMovement: false,
+        enableAdvancedLighting: false,
+        updateFrequency: 3, // Update every 3 frames for better performance
+        textureQuality: {
+            minFilter: THREE.NearestFilter,
+            magFilter: THREE.NearestFilter
+        }
+    },
+    medium: {
+        skillCount: 35, // Keep all skills
+        canvasResolution: 256, // Smaller canvas than before
+        fontSize: 80, // Smaller font
+        glowLayers: 4, // Reduced glow layers
+        animationSpeed: 0.7, // Slightly slower
+        pixelRatio: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 1.2) : 1.2,
+        antialias: true,
+        enableFloating: true,
+        enableCameraMovement: true,
+        enableAdvancedLighting: false, // Disable advanced lighting to compensate
+        updateFrequency: 2, // Update every 2 frames
+        textureQuality: {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.NearestFilter // Mixed quality for performance
+        }
+    },
+    high: {
+        skillCount: 35, // Keep all skills
+        canvasResolution: 512, // Reduced from 1024
+        fontSize: 100, // Reduced from 120
+        glowLayers: 6, // Reduced from 8
+        animationSpeed: 1,
+        pixelRatio: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 1.8) : 1.8,
+        antialias: true,
+        enableFloating: true,
+        enableCameraMovement: true,
+        enableAdvancedLighting: true,
+        updateFrequency: 1,
+        textureQuality: {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter
+        }
+    }
+}
+
 interface Skill {
     name: string
     color: string
@@ -48,7 +180,6 @@ const skills: Skill[] = [
     { name: 'Python', color: '#3776ab' },
 ];
 
-
 const title = '⚡ Skills & Technologies'
 
 export default function SkillsSection() {
@@ -56,6 +187,12 @@ export default function SkillsSection() {
     const sceneRef = useRef<THREE.Scene | null>(null)
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
     const frameRef = useRef<number | null>(null)
+    const frameCountRef = useRef(0)
+    const performanceRef = useRef({ fps: 60, lastTime: 0, frameCount: 0 })
+
+    // Performance state
+    const [devicePerformance, setDevicePerformance] = useState<PerformanceTier>('medium')
+    const config = PERFORMANCE_CONFIGS[devicePerformance]
 
     // State for drag indicator
     const [showDragIndicator, setShowDragIndicator] = useState(true)
@@ -72,10 +209,18 @@ export default function SkillsSection() {
         isTouch: false // Track if we're using touch
     })
 
-    // Create skill spheres data
+    // Detect device performance on client side
+    useEffect(() => {
+        const detectedPerformance = detectDevicePerformance()
+        setDevicePerformance(detectedPerformance)
+        console.log(`Skills Section - Device performance detected: ${detectedPerformance}`)
+    }, [])
+
+    // Create skill spheres data with adaptive count
     const skillSpheres = useMemo(() => {
-        return skills.map((skill, index) => {
-            const angle = (index / skills.length) * Math.PI * 2
+        const adaptiveSkills = skills.slice(0, config.skillCount)
+        return adaptiveSkills.map((skill, index) => {
+            const angle = (index / adaptiveSkills.length) * Math.PI * 2
             const radius = 8 // Increased radius for more space
             return {
                 ...skill,
@@ -90,13 +235,13 @@ export default function SkillsSection() {
                     z: Math.random() * Math.PI
                 },
                 rotationSpeed: {
-                    x: (Math.random() - 0.5) * 0.02,
-                    y: (Math.random() - 0.5) * 0.02,
-                    z: (Math.random() - 0.5) * 0.02
+                    x: (Math.random() - 0.5) * 0.02 * config.animationSpeed,
+                    y: (Math.random() - 0.5) * 0.02 * config.animationSpeed,
+                    z: (Math.random() - 0.5) * 0.02 * config.animationSpeed
                 }
             }
         })
-    }, [])
+    }, [config.skillCount, config.animationSpeed])
 
     // Hide drag indicator after first interaction
     const handleUserInteraction = () => {
@@ -128,26 +273,29 @@ export default function SkillsSection() {
         const scene = new THREE.Scene()
         scene.background = null // Transparent background
 
-        // Camera setup
+        // Camera setup with SSR safety
         const camera = new THREE.PerspectiveCamera(
             75,
-            window.innerWidth / window.innerHeight,
+            (typeof window !== 'undefined' ? window.innerWidth : 1920) / (typeof window !== 'undefined' ? window.innerHeight : 1080),
             0.1,
             1000
         )
         camera.position.set(0, 0, 15)
 
-        // Renderer setup
+        // Renderer setup with adaptive settings
         const renderer = new THREE.WebGLRenderer({
-            antialias: true,
+            antialias: config.antialias,
             alpha: true,
-            powerPreference: "high-performance"
+            powerPreference: devicePerformance === 'high' ? "high-performance" : "default"
         })
-        renderer.setSize(window.innerWidth, window.innerHeight)
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+        renderer.setSize(
+            typeof window !== 'undefined' ? window.innerWidth : 1920,
+            typeof window !== 'undefined' ? window.innerHeight : 1080
+        )
+        renderer.setPixelRatio(config.pixelRatio)
         mountRef.current.appendChild(renderer.domElement)
 
-        // Basic Lighting (shadows removed)
+        // Adaptive Lighting setup
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
         scene.add(ambientLight)
 
@@ -155,14 +303,16 @@ export default function SkillsSection() {
         directionalLight.position.set(10, 10, 5)
         scene.add(directionalLight)
 
-        // Add additional lights for better 3D effect
-        const fillLight = new THREE.DirectionalLight(0x4169e1, 0.3)
-        fillLight.position.set(-10, -5, -5)
-        scene.add(fillLight)
+        // Advanced lighting only for medium/high performance
+        if (config.enableAdvancedLighting) {
+            const fillLight = new THREE.DirectionalLight(0x4169e1, 0.3)
+            fillLight.position.set(-10, -5, -5)
+            scene.add(fillLight)
 
-        const rimLight = new THREE.DirectionalLight(0xff6b6b, 0.2)
-        rimLight.position.set(0, 0, -10)
-        scene.add(rimLight)
+            const rimLight = new THREE.DirectionalLight(0xff6b6b, 0.2)
+            rimLight.position.set(0, 0, -10)
+            scene.add(rimLight)
+        }
 
         // Create a group to hold all text meshes for easier rotation
         const textGroup = new THREE.Group()
@@ -173,7 +323,33 @@ export default function SkillsSection() {
         const raycaster = new THREE.Raycaster()
         const mouse = new THREE.Vector2()
 
-        // Create floating 3D text with unlimited dimensions
+        // Texture caching for performance
+        const textureCache = new Map<string, THREE.CanvasTexture>()
+        
+        // Batch processing for better performance
+        const animationBatch = {
+            sprites: [] as THREE.Sprite[],
+            lastUpdate: 0,
+            batchSize: devicePerformance === 'low' ? 5 : devicePerformance === 'medium' ? 10 : 35
+        }
+
+        // Performance monitoring
+        const updatePerformanceStats = (currentTime: number) => {
+            performanceRef.current.frameCount++
+            
+            if (currentTime - performanceRef.current.lastTime >= 1000) {
+                performanceRef.current.fps = performanceRef.current.frameCount
+                performanceRef.current.frameCount = 0
+                performanceRef.current.lastTime = currentTime
+                
+                // Adaptive quality based on FPS
+                if (performanceRef.current.fps < 30 && devicePerformance !== 'low') {
+                    console.warn('Skills Section: Low FPS detected, consider reducing quality')
+                }
+            }
+        }
+
+        // Optimized text creation with adaptive quality and caching
         const createTextMesh = (text: string,
             skillData: Skill & { position: { x: number, y: number, z: number }, color: string },
             index: number) => {
@@ -183,63 +359,84 @@ export default function SkillsSection() {
                 return
             }
 
-            // Create dynamic high-resolution canvas based on text length
-            const canvas = document.createElement('canvas')
-            const context = canvas.getContext('2d')
-            if (!context) return
+            // Create cache key for texture reuse (include text length for proper caching)
+            const cacheKey = `${text}-${skillData.color}-${config.fontSize}-${config.glowLayers}-${text.length}`
+            
+            let texture: THREE.CanvasTexture
+            
+            // Check if texture is already cached
+            if (textureCache.has(cacheKey)) {
+                texture = textureCache.get(cacheKey)!.clone()
+            } else {
+                // Create dynamic canvas with adaptive resolution
+                const canvas = document.createElement('canvas')
+                const context = canvas.getContext('2d')
+                if (!context) return
 
-            // Set initial font to measure text
-            context.font = 'bold 120px Arial, sans-serif'
-            const textMetrics = context.measureText(text)
+                // Set font based on performance config
+                const fontSize = config.fontSize
+                context.font = `bold ${fontSize}px Arial, sans-serif`
+                const textMetrics = context.measureText(text)
 
-            // Calculate canvas dimensions based on text size with generous padding
-            const textWidth = textMetrics.width
-            const textHeight = 120 // Font size
-            const padding = 100
+                // Calculate canvas dimensions to fit all text regardless of length
+                const textWidth = textMetrics.width
+                const textHeight = fontSize
+                const padding = Math.max(30, fontSize / 2) // Adequate padding based on font size
 
-            // Set canvas size to accommodate text without restrictions
-            canvas.width = Math.max(textWidth + padding * 2, 512)
-            canvas.height = Math.max(textHeight + padding * 2, 256)
+                // Set canvas size to accommodate full text without restrictions
+                canvas.width = Math.max(textWidth + padding * 2, config.canvasResolution)
+                canvas.height = Math.max(textHeight + padding * 2, fontSize + padding * 2)
 
-            // Clear canvas with transparent background
-            context.clearRect(0, 0, canvas.width, canvas.height)
+                // Clear canvas with transparent background
+                context.clearRect(0, 0, canvas.width, canvas.height)
 
-            // Re-set font properties after canvas resize
-            context.font = 'bold 120px Arial, sans-serif'
-            context.textAlign = 'center'
-            context.textBaseline = 'middle'
+                // Re-set font properties after canvas resize
+                context.font = `bold ${fontSize}px Arial, sans-serif`
+                context.textAlign = 'center'
+                context.textBaseline = 'middle'
 
-            // Create text with enhanced glow effect
-            context.shadowColor = skillData.color || '#ffffff'
-            context.shadowOffsetX = 0
-            context.shadowOffsetY = 0
+                // Create text with adaptive glow effect
+                context.shadowColor = skillData.color || '#ffffff'
+                context.shadowOffsetX = 0
+                context.shadowOffsetY = 0
 
-            // Draw multiple glow layers for stronger effect
-            for (let i = 0; i < 8; i++) {
-                context.shadowBlur = 30 - i * 3
-                context.strokeStyle = skillData.color || '#ffffff'
-                context.lineWidth = 5 - i * 2
-                context.strokeText(text, canvas.width / 2, canvas.height / 2)
+                // Draw glow layers based on performance config (optimized)
+                const glowIntensity = devicePerformance === 'low' ? 0.5 : devicePerformance === 'medium' ? 0.7 : 1
+                for (let i = 0; i < config.glowLayers; i++) {
+                    context.shadowBlur = (20 - i * 2) * glowIntensity // Reduced blur intensity
+                    context.strokeStyle = skillData.color || '#ffffff'
+                    context.lineWidth = Math.max(1, (3 - i) * glowIntensity) // Reduced line width
+                    context.strokeText(text, canvas.width / 2, canvas.height / 2)
+                }
+
+                // Draw main text with simplified gradient for low-end devices
+                if (devicePerformance === 'low') {
+                    context.fillStyle = skillData.color
+                } else {
+                    const gradient = context.createLinearGradient(0, 0, 0, canvas.height)
+                    gradient.addColorStop(0, skillData.color)
+                    gradient.addColorStop(1, `${skillData.color}80`)
+                    context.fillStyle = gradient
+                }
+                context.shadowBlur = 0
+                context.fillText(text, canvas.width / 2, canvas.height / 2)
+
+                // Add text outline for definition (simplified for low-end)
+                if (devicePerformance !== 'low') {
+                    context.strokeStyle = '#ffffff'
+                    context.lineWidth = Math.max(1, 3 * (config.fontSize / 120)) // Reduced outline
+                    context.shadowBlur = 0
+                    context.strokeText(text, canvas.width / 2, canvas.height / 2)
+                }
+
+                // Create texture from canvas with adaptive filtering
+                texture = new THREE.CanvasTexture(canvas)
+                texture.minFilter = config.textureQuality.minFilter
+                texture.magFilter = config.textureQuality.magFilter
+                
+                // Cache the texture for reuse
+                textureCache.set(cacheKey, texture)
             }
-
-            // Draw main text with gradient effect
-            const gradient = context.createLinearGradient(0, 0, 0, canvas.height)
-            gradient.addColorStop(0, skillData.color)
-            gradient.addColorStop(1, `${skillData.color}80`)
-            context.fillStyle = gradient
-            context.shadowBlur = 0
-            context.fillText(text, canvas.width / 2, canvas.height / 2)
-
-            // Add text outline for definition
-            context.strokeStyle = '#ffffff'
-            context.lineWidth = 6
-            context.shadowBlur = 0
-            context.strokeText(text, canvas.width / 2, canvas.height / 2)
-
-            // Create texture from canvas
-            const texture = new THREE.CanvasTexture(canvas)
-            texture.minFilter = THREE.LinearFilter
-            texture.magFilter = THREE.LinearFilter
 
             // Create sprite material
             const spriteMaterial = new THREE.SpriteMaterial({
@@ -251,9 +448,15 @@ export default function SkillsSection() {
 
             const sprite = new THREE.Sprite(spriteMaterial)
 
-            // Dynamic scaling based on text length and canvas size - no limits
-            const baseScale = Math.max(textWidth / 200, 2) // Minimum scale of 2
-            const aspectRatio = canvas.width / canvas.height
+            // Dynamic scaling based on actual text dimensions to show all characters
+            const textMetrics = document.createElement('canvas').getContext('2d')!
+            textMetrics.font = `bold ${config.fontSize}px Arial, sans-serif`
+            const measuredWidth = textMetrics.measureText(text).width
+            
+            // Calculate scale to ensure text is readable but fits well in 3D space
+            const baseScale = Math.max(2, measuredWidth / 150) * (config.fontSize / 120)
+            const aspectRatio = texture.image ? (texture.image.width / texture.image.height) : (measuredWidth / config.fontSize)
+            
             sprite.scale.set(
                 baseScale * aspectRatio,
                 baseScale,
@@ -291,7 +494,9 @@ export default function SkillsSection() {
             createTextMesh(skillData.name, skillData, index)
         })
 
-        // MOUSE EVENT HANDLERS
+        // MOUSE EVENT HANDLERS with throttling for low-end devices
+        let mouseUpdateTimeout: NodeJS.Timeout | null = null
+        
         const handleMouseDown = (event: MouseEvent) => {
             handleUserInteraction()
             dragStateRef.current.isDragging = true
@@ -301,10 +506,14 @@ export default function SkillsSection() {
                 x: event.clientX,
                 y: event.clientY
             }
-            document.body.style.cursor = 'grabbing'
+            if (typeof document !== 'undefined') {
+                document.body.style.cursor = 'grabbing'
+            }
         }
 
         const handleMouseMove = (event: MouseEvent) => {
+            if (devicePerformance === 'low' && mouseUpdateTimeout) return
+            
             const normalizedCoords = getNormalizedCoordinates(event.clientX, event.clientY, renderer)
             mouse.x = normalizedCoords.x
             mouse.y = normalizedCoords.y
@@ -316,7 +525,7 @@ export default function SkillsSection() {
                 }
 
                 // Convert mouse movement to rotation
-                const rotationSpeed = 0.005
+                const rotationSpeed = 0.005 * config.animationSpeed
                 dragStateRef.current.velocity.x = deltaMove.y * rotationSpeed
                 dragStateRef.current.velocity.y = deltaMove.x * rotationSpeed
 
@@ -330,7 +539,9 @@ export default function SkillsSection() {
                     y: event.clientY
                 }
 
-                document.body.style.cursor = 'grabbing'
+                if (typeof document !== 'undefined') {
+                    document.body.style.cursor = 'grabbing'
+                }
             } else if (!dragStateRef.current.isDragging) {
                 // Handle hover effects when not dragging
                 raycaster.setFromCamera(mouse, camera)
@@ -353,17 +564,29 @@ export default function SkillsSection() {
                         intersectedSprite.userData.targetScale.multiplyScalar(1.8) // Increased hover scale
                         intersectedSprite.userData.targetOpacity = 1.3
                     }
-                    document.body.style.cursor = 'pointer'
+                    if (typeof document !== 'undefined') {
+                        document.body.style.cursor = 'pointer'
+                    }
                 } else {
-                    document.body.style.cursor = dragStateRef.current.isDragging ? 'grabbing' : 'grab'
+                    if (typeof document !== 'undefined') {
+                        document.body.style.cursor = dragStateRef.current.isDragging ? 'grabbing' : 'grab'
+                    }
                 }
+            }
+            
+            if (devicePerformance === 'low') {
+                mouseUpdateTimeout = setTimeout(() => {
+                    mouseUpdateTimeout = null
+                }, 16) // ~60fps throttle
             }
         }
 
         const handleMouseUp = () => {
             if (dragStateRef.current.isDragging && !dragStateRef.current.isTouch) {
                 dragStateRef.current.isDragging = false
-                document.body.style.cursor = 'grab'
+                if (typeof document !== 'undefined') {
+                    document.body.style.cursor = 'grab'
+                }
 
                 // Resume auto-rotation after a delay if user stops interacting
                 setTimeout(() => {
@@ -458,7 +681,7 @@ export default function SkillsSection() {
                 }
 
                 // Convert touch movement to rotation
-                const rotationSpeed = 0.007
+                const rotationSpeed = 0.007 * config.animationSpeed
                 dragStateRef.current.velocity.x = deltaMove.y * rotationSpeed
                 dragStateRef.current.velocity.y = deltaMove.x * rotationSpeed
 
@@ -520,24 +743,36 @@ export default function SkillsSection() {
             }
         }
 
-        // Add mouse event listeners
-        renderer.domElement.addEventListener('mousedown', handleMouseDown)
-        renderer.domElement.addEventListener('mousemove', handleMouseMove)
-        renderer.domElement.addEventListener('mouseup', handleMouseUp)
-        renderer.domElement.addEventListener('click', handleClick)
-        renderer.domElement.addEventListener('mouseleave', handleMouseUp)
+        // Add event listeners with SSR safety
+        if (typeof window !== 'undefined') {
+            renderer.domElement.addEventListener('mousedown', handleMouseDown)
+            renderer.domElement.addEventListener('mousemove', handleMouseMove, { passive: true })
+            renderer.domElement.addEventListener('mouseup', handleMouseUp)
+            renderer.domElement.addEventListener('click', handleClick)
+            renderer.domElement.addEventListener('mouseleave', handleMouseUp)
 
-        // Add touch event listeners
-        renderer.domElement.addEventListener('touchstart', handleTouchStart)
-        renderer.domElement.addEventListener('touchmove', handleTouchMove)
-        renderer.domElement.addEventListener('touchend', handleTouchEnd)
+            // Add touch event listeners
+            renderer.domElement.addEventListener('touchstart', handleTouchStart)
+            renderer.domElement.addEventListener('touchmove', handleTouchMove)
+            renderer.domElement.addEventListener('touchend', handleTouchEnd)
 
-        // Set initial cursor
-        renderer.domElement.style.cursor = 'grab'
+            // Set initial cursor
+            renderer.domElement.style.cursor = 'grab'
+        }
 
-        // Animation loop with smooth transitions
-        const animate = () => {
+        // Optimized animation loop with frame skipping
+        const animate = (animationTime: number) => {
             frameRef.current = requestAnimationFrame(animate)
+
+            // Performance monitoring
+            updatePerformanceStats(animationTime)
+            
+            // Frame skipping for low-end devices
+            frameCountRef.current++
+            if (frameCountRef.current % config.updateFrequency !== 0) {
+                renderer.render(scene, camera)
+                return
+            }
 
             // Apply drag rotation to text group
             if (dragStateRef.current.isDragging) {
@@ -559,41 +794,86 @@ export default function SkillsSection() {
                 if (dragStateRef.current.autoRotate &&
                     Math.abs(dragStateRef.current.velocity.x) < 0.001 &&
                     Math.abs(dragStateRef.current.velocity.y) < 0.001) {
-                    textGroup.rotation.y += 0.002
+                    textGroup.rotation.y += 0.002 * config.animationSpeed
                     dragStateRef.current.rotation.y = textGroup.rotation.y
                 }
             }
 
-            // Animate text sprites with smooth transitions
-            textMeshes.forEach((sprite, index) => {
-                const skillData = skillSpheres[index]
+            // Batch animate text sprites for better performance
+            const currentTime = Date.now()
+            const shouldUpdateBatch = currentTime - animationBatch.lastUpdate > (16 * config.updateFrequency) // Throttle based on update frequency
+            
+            if (shouldUpdateBatch) {
+                animationBatch.lastUpdate = currentTime
+                
+                // Process sprites in batches for low-end devices
+                const startIndex = frameCountRef.current % Math.ceil(textMeshes.length / animationBatch.batchSize) * animationBatch.batchSize
+                const endIndex = Math.min(startIndex + animationBatch.batchSize, textMeshes.length)
+                
+                for (let i = startIndex; i < endIndex; i++) {
+                    const sprite = textMeshes[i]
+                    const skillData = skillSpheres[i]
 
-                // Safety check
-                if (!skillData || !skillData.position || !sprite.userData) return
+                    // Safety check
+                    if (!skillData || !skillData.position || !sprite.userData) continue
 
-                // Smooth scale transition
-                const lerpFactor = 0.1
-                sprite.userData.currentScale.lerp(sprite.userData.targetScale, lerpFactor)
-                sprite.scale.copy(sprite.userData.currentScale)
+                    // Smooth scale transition
+                    const lerpFactor = devicePerformance === 'low' ? 0.15 : 0.1 // Faster lerp for low-end
+                    sprite.userData.currentScale.lerp(sprite.userData.targetScale, lerpFactor)
+                    sprite.scale.copy(sprite.userData.currentScale)
 
-                // Smooth opacity transition
-                sprite.userData.currentOpacity += (sprite.userData.targetOpacity - sprite.userData.currentOpacity) * lerpFactor
-                sprite.material.opacity = Math.min(1, sprite.userData.currentOpacity)
+                    // Smooth opacity transition
+                    sprite.userData.currentOpacity += (sprite.userData.targetOpacity - sprite.userData.currentOpacity) * lerpFactor
+                    sprite.material.opacity = Math.min(1, sprite.userData.currentOpacity)
 
-                // Floating animation (relative to original position)
-                const baseY = skillData.position.y
-                const floatOffset = Math.sin(Date.now() * 0.001 + index) * 0.6
-                const hoverOffset = sprite.userData.isHovered ? 0.5 : 0
-                sprite.position.y = baseY + floatOffset + hoverOffset
+                    // Floating animation (if enabled)
+                    if (config.enableFloating) {
+                        const baseY = skillData.position.y
+                        const floatOffset = Math.sin(currentTime * 0.001 * config.animationSpeed + i) * 0.6
+                        const hoverOffset = sprite.userData.isHovered ? 0.5 : 0
+                        sprite.position.y = baseY + floatOffset + hoverOffset
+                    }
 
-                // Enhanced rotation with hover effect
-                const rotationSpeed = sprite.userData.isHovered ? 0.003 : 0.0008
-                sprite.rotation.z = Math.sin(Date.now() * rotationSpeed + index) * 0.3
-            })
+                    // Enhanced rotation with hover effect (simplified for low-end)
+                    if (devicePerformance !== 'low' || sprite.userData.isHovered) {
+                        const rotationSpeed = sprite.userData.isHovered ? 0.003 : 0.0008
+                        sprite.rotation.z = Math.sin(currentTime * rotationSpeed * config.animationSpeed + i) * 0.3
+                    }
+                }
+            } else if (devicePerformance === 'high') {
+                // High-end devices can animate all sprites every frame
+                textMeshes.forEach((sprite, index) => {
+                    const skillData = skillSpheres[index]
 
-            // Dynamic camera movement (less aggressive when dragging)
-            if (!dragStateRef.current.isDragging) {
-                const time = Date.now() * 0.0002
+                    // Safety check
+                    if (!skillData || !skillData.position || !sprite.userData) return
+
+                    // Smooth scale transition
+                    const lerpFactor = 0.1
+                    sprite.userData.currentScale.lerp(sprite.userData.targetScale, lerpFactor)
+                    sprite.scale.copy(sprite.userData.currentScale)
+
+                    // Smooth opacity transition
+                    sprite.userData.currentOpacity += (sprite.userData.targetOpacity - sprite.userData.currentOpacity) * lerpFactor
+                    sprite.material.opacity = Math.min(1, sprite.userData.currentOpacity)
+
+                    // Floating animation (if enabled)
+                    if (config.enableFloating) {
+                        const baseY = skillData.position.y
+                        const floatOffset = Math.sin(currentTime * 0.001 * config.animationSpeed + index) * 0.6
+                        const hoverOffset = sprite.userData.isHovered ? 0.5 : 0
+                        sprite.position.y = baseY + floatOffset + hoverOffset
+                    }
+
+                    // Enhanced rotation with hover effect
+                    const rotationSpeed = sprite.userData.isHovered ? 0.003 : 0.0008
+                    sprite.rotation.z = Math.sin(currentTime * rotationSpeed * config.animationSpeed + index) * 0.3
+                })
+            }
+
+            // Dynamic camera movement (if enabled and not dragging)
+            if (config.enableCameraMovement && !dragStateRef.current.isDragging) {
+                const time = currentTime * 0.0002 * config.animationSpeed
                 const radius = 15
                 camera.position.x = Math.cos(time) * radius * 0.1
                 camera.position.z = radius + Math.sin(time) * 2
@@ -604,41 +884,56 @@ export default function SkillsSection() {
             renderer.render(scene, camera)
         }
 
-        // Handle resize
+        // Handle resize with SSR safety and debouncing
+        let resizeTimeout: NodeJS.Timeout
         const handleResize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight
-            camera.updateProjectionMatrix()
-            renderer.setSize(window.innerWidth, window.innerHeight)
+            clearTimeout(resizeTimeout)
+            resizeTimeout = setTimeout(() => {
+                if (typeof window === 'undefined') return
+                
+                camera.aspect = window.innerWidth / window.innerHeight
+                camera.updateProjectionMatrix()
+                renderer.setSize(window.innerWidth, window.innerHeight)
+            }, 100)
         }
 
-        window.addEventListener('resize', handleResize)
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', handleResize, { passive: true })
+        }
 
         // Store references
         sceneRef.current = scene
         rendererRef.current = renderer
 
         // Start animation
-        animate()
+        animate(0)
 
         // Cleanup
         return () => {
             if (frameRef.current) {
                 cancelAnimationFrame(frameRef.current)
             }
+            
+            if (mouseUpdateTimeout) {
+                clearTimeout(mouseUpdateTimeout)
+            }
+            clearTimeout(resizeTimeout)
 
-            window.removeEventListener('resize', handleResize)
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('resize', handleResize)
 
-            // Remove mouse event listeners
-            renderer.domElement.removeEventListener('mousedown', handleMouseDown)
-            renderer.domElement.removeEventListener('mousemove', handleMouseMove)
-            renderer.domElement.removeEventListener('mouseup', handleMouseUp)
-            renderer.domElement.removeEventListener('click', handleClick)
-            renderer.domElement.removeEventListener('mouseleave', handleMouseUp)
+                // Remove mouse event listeners
+                renderer.domElement.removeEventListener('mousedown', handleMouseDown)
+                renderer.domElement.removeEventListener('mousemove', handleMouseMove)
+                renderer.domElement.removeEventListener('mouseup', handleMouseUp)
+                renderer.domElement.removeEventListener('click', handleClick)
+                renderer.domElement.removeEventListener('mouseleave', handleMouseUp)
 
-            // Remove touch event listeners
-            renderer.domElement.removeEventListener('touchstart', handleTouchStart)
-            renderer.domElement.removeEventListener('touchmove', handleTouchMove)
-            renderer.domElement.removeEventListener('touchend', handleTouchEnd)
+                // Remove touch event listeners
+                renderer.domElement.removeEventListener('touchstart', handleTouchStart)
+                renderer.domElement.removeEventListener('touchmove', handleTouchMove)
+                renderer.domElement.removeEventListener('touchend', handleTouchEnd)
+            }
 
             if (mountRef.current && renderer.domElement) {
                 mountRef.current.removeChild(renderer.domElement)
@@ -673,9 +968,11 @@ export default function SkillsSection() {
                 }
             })
             renderer.dispose()
-            document.body.style.cursor = 'default'
+            if (typeof document !== 'undefined') {
+                document.body.style.cursor = 'default'
+            }
         }
-    }, [skillSpheres])
+    }, [skillSpheres, config, devicePerformance])
 
     return (
         <ClipPathBorders>
