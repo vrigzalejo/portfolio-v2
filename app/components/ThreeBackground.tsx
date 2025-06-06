@@ -14,6 +14,8 @@ export default function ThreeBackground() {
     const targetRotationRef = useRef({ x: 0, y: 0 })
     const timeRef = useRef(0)
     const [isDarkMode, setIsDarkMode] = useState(false)
+    const [hasGyroscope, setHasGyroscope] = useState(false)
+    const gyroRef = useRef({ beta: 0, gamma: 0 })
 
     useEffect(() => {
         if (!containerRef.current) return
@@ -176,15 +178,68 @@ export default function ThreeBackground() {
             attributeFilter: ['class'] // Only watch for class changes
         })
 
-        // Mouse movement handler
-        const handleMouseMove = (event: MouseEvent) => {
-            // Normalize mouse position to -1 to 1 range
-            mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1
-            mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1
+        // Device detection and gyroscope setup
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
 
-            // Set target rotation based on mouse position
-            targetRotationRef.current.x = mouseRef.current.y * 0.3
-            targetRotationRef.current.y = mouseRef.current.x * 0.3
+        // Request device orientation permission for iOS 13+
+        const requestGyroPermission = async () => {
+            // Type assertion for iOS DeviceOrientationEvent with requestPermission
+            const DeviceOrientationEventWithPermission = DeviceOrientationEvent as unknown as {
+                requestPermission?: () => Promise<'granted' | 'denied'>
+            }
+            
+            if (typeof DeviceOrientationEventWithPermission.requestPermission === 'function') {
+                try {
+                    const permission = await DeviceOrientationEventWithPermission.requestPermission()
+                    return permission === 'granted'
+                } catch (error) {
+                    console.log('Device orientation permission denied:', error)
+                    return false
+                }
+            }
+            return true // Android or older iOS
+        }
+
+        // Initialize gyroscope if available
+        const initializeGyroscope = async () => {
+            if ((isMobile || hasTouch) && window.DeviceOrientationEvent) {
+                const hasPermission = await requestGyroPermission()
+                if (hasPermission) {
+                    setHasGyroscope(true)
+                    console.log('Gyroscope initialized')
+                }
+            }
+        }
+
+        initializeGyroscope()
+
+        // Gyroscope handler
+        const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+            if (event.beta !== null && event.gamma !== null) {
+                // Normalize gyroscope values to -1 to 1 range
+                // Beta: front-to-back tilt (-180 to 180)
+                // Gamma: left-to-right tilt (-90 to 90)
+                gyroRef.current.beta = Math.max(-90, Math.min(90, event.beta)) / 90
+                gyroRef.current.gamma = Math.max(-90, Math.min(90, event.gamma)) / 90
+
+                // Set target rotation based on device orientation
+                targetRotationRef.current.x = gyroRef.current.beta * 0.3
+                targetRotationRef.current.y = gyroRef.current.gamma * 0.3
+            }
+        }
+
+        // Mouse movement handler (fallback for desktop)
+        const handleMouseMove = (event: MouseEvent) => {
+            if (!hasGyroscope) {
+                // Normalize mouse position to -1 to 1 range
+                mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1
+                mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+                // Set target rotation based on mouse position
+                targetRotationRef.current.x = mouseRef.current.y * 0.3
+                targetRotationRef.current.y = mouseRef.current.x * 0.3
+            }
         }
 
         // Animation loop
@@ -223,10 +278,22 @@ export default function ThreeBackground() {
                 particlesRef.current.rotation.x += rotationSpeed
                 particlesRef.current.rotation.y += rotationSpeed * 1.5
 
-                // Camera movement based on mouse with some automatic drift
+                // Camera movement based on input (gyroscope or mouse) with some automatic drift
                 const driftIntensity = currentDarkMode ? 0.8 : 0.4
-                const targetCameraX = mouseRef.current.x * 2 + Math.sin(timeRef.current * 0.3) * driftIntensity
-                const targetCameraY = mouseRef.current.y * 2 + Math.cos(timeRef.current * 0.2) * driftIntensity
+                let inputX, inputY
+                
+                if (hasGyroscope) {
+                    // Use gyroscope data
+                    inputX = gyroRef.current.gamma
+                    inputY = gyroRef.current.beta
+                } else {
+                    // Use mouse data
+                    inputX = mouseRef.current.x
+                    inputY = mouseRef.current.y
+                }
+
+                const targetCameraX = inputX * 2 + Math.sin(timeRef.current * 0.3) * driftIntensity
+                const targetCameraY = inputY * 2 + Math.cos(timeRef.current * 0.2) * driftIntensity
 
                 cameraRef.current.position.x += (targetCameraX - cameraRef.current.position.x) * 0.05
                 cameraRef.current.position.y += (targetCameraY - cameraRef.current.position.y) * 0.05
@@ -234,8 +301,8 @@ export default function ThreeBackground() {
                 // Make camera look at the center with slight offset and automatic movement
                 const lookAtIntensity = currentDarkMode ? 3 : 2
                 cameraRef.current.lookAt(
-                    mouseRef.current.x * 5 + Math.sin(timeRef.current * 0.4) * lookAtIntensity,
-                    mouseRef.current.y * 5 + Math.cos(timeRef.current * 0.3) * lookAtIntensity,
+                    inputX * 5 + Math.sin(timeRef.current * 0.4) * lookAtIntensity,
+                    inputY * 5 + Math.cos(timeRef.current * 0.3) * lookAtIntensity,
                     0
                 )
 
@@ -261,6 +328,11 @@ export default function ThreeBackground() {
         // Add event listeners
         window.addEventListener('mousemove', handleMouseMove)
         window.addEventListener('resize', handleResize)
+        
+        // Add gyroscope event listener if available
+        if (hasGyroscope) {
+            window.addEventListener('deviceorientation', handleDeviceOrientation)
+        }
 
         // Cleanup
         return () => {
@@ -269,6 +341,12 @@ export default function ThreeBackground() {
             }
             window.removeEventListener('mousemove', handleMouseMove)
             window.removeEventListener('resize', handleResize)
+            
+            // Remove gyroscope event listener if it was added
+            if (hasGyroscope) {
+                window.removeEventListener('deviceorientation', handleDeviceOrientation)
+            }
+            
             observer.disconnect()
 
             if (containerRef.current && rendererRef.current) {
@@ -279,7 +357,7 @@ export default function ThreeBackground() {
             material.dispose()
             rendererRef.current?.dispose()
         }
-    }, [isDarkMode]) // Add isDarkMode to dependency array
+    }, [isDarkMode, hasGyroscope]) // Add isDarkMode and hasGyroscope to dependency array
 
     return (
         <div
