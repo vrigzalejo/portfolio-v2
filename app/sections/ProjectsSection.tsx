@@ -97,7 +97,7 @@ export default function ProjectsSection() {
                         <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {projects.map((project) => (
-                                <div key={project.id} className="glass-effect p-6 rounded-2xl shadow-lg">
+                                <div key={project.id} className="bg-white/10 dark:bg-gray-900/90 backdrop-blur-md border border-white/20 dark:border-gray-700/50 p-6 rounded-2xl shadow-lg">
                                     <div className="mb-6">
                                         <HoverImage
                                             primaryImage={project.cardImg}

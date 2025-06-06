@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 type Experience = {
     title: string;
@@ -13,14 +14,20 @@ type TimelineProps = {
 };
 
 export default function Timeline({ experiences }: TimelineProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start 0.8", "end 0.2"]
+    });
+    
+    const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
     return (
-        <div className="relative pl-6">
+        <div ref={containerRef} className="relative pl-6">
             {/* Animated Vertical Line */}
             <motion.div
-                className="absolute left-0 top-0 w-1 bg-gray-600 dark:bg-gray-600"
-                initial={{ height: 0 }}
-                animate={{ height: "100%" }}
-                transition={{ duration: experiences.length * 0.4, ease: "easeInOut" }}
+                className="absolute left-0 top-0 w-2 bg-gray-600 dark:bg-gray-400"
+                style={{ height: lineHeight }}
             />
 
             {experiences.map((exp, index) => (
@@ -33,10 +40,16 @@ export default function Timeline({ experiences }: TimelineProps) {
                     viewport={{ once: true }}
                 >
                     {/* Timeline Dot */}
-                    <span className="absolute -left-11.75 top-1/2 transform -translate-y-1/2 w-4 h-4 glass-effect rounded-full bg-gray-900"></span>
+                    <motion.span 
+                        className="absolute -left-[2.75em] top-1/2 transform -translate-y-1/2 w-4 h-4 bg-gray-600 dark:bg-gray-400 rounded-full"
+                        initial={{ scale: 0, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", duration: 0.6, delay: index * 0.1 }}
+                        viewport={{ once: true }}
+                    ></motion.span>
 
                     {/* Experience Card */}
-                    <div className="glass-effect dark:bg-gray-800 p-6 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
+                    <div className="bg-white/10 dark:bg-gray-900/90 backdrop-blur-md border border-white/20 dark:border-gray-700/50 p-6 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                             {exp.title}
                         </h3>
