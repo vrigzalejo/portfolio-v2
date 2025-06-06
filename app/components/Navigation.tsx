@@ -43,8 +43,8 @@ export default function Navigation() {
   }
 
   return (
-    <nav className={`fixed top-0 w-full z-50 backdrop-blur-lg transition-all border-b 
-      ${scrolled ? 'shadow-lg' : 'shadow-lg dark:bg-gray-900/80'} ${styles.glassNav} ${scrolled ? styles.scrolled : ''}`}>
+    <nav className={`fixed top-0 w-full z-50 bg-white/10 dark:bg-gray-900/90 backdrop-blur-lg transition-all border-b border-white/20 dark:border-gray-700/50
+      ${scrolled ? 'shadow-lg' : 'shadow-lg'} ${styles.glassNav} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.floatingOrb} style={{ top: '-50px', right: '10%' }}></div>
       <div className={styles.floatingOrb} style={{ top: '-75px', left: '20%', animationDelay: '2s' }}></div>
 
@@ -98,7 +98,7 @@ export default function Navigation() {
 
         {/* Mobile Navigation - Show on all screens below xl (1280px) */}
         {isMobileMenuOpen && (
-          <div className={`xl:hidden ${styles.mobileMenu} ${styles.slideDown}`}>
+          <div className={`xl:hidden bg-white/10 dark:bg-gray-900/90 border border-white/20 dark:border-gray-700/50 ${styles.mobileMenu} ${styles.slideDown}`}>
             <div className="px-4 py-6 space-y-1">
               {navItems.map((item) => (
                 <button
