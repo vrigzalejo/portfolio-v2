@@ -14,8 +14,12 @@ export default function ThreeBackground() {
     const targetRotationRef = useRef({ x: 0, y: 0 })
     const timeRef = useRef(0)
     const [isDarkMode, setIsDarkMode] = useState(false)
-    const [hasGyroscope, setHasGyroscope] = useState(false)
-    const gyroRef = useRef({ beta: 0, gamma: 0 })
+    const [isTouchDevice, setIsTouchDevice] = useState(false)
+    const touchRef = useRef({ x: 0, y: 0 })
+    const lastTouchRef = useRef({ x: 0, y: 0 })
+    const isInteractingRef = useRef(false)
+    const touchVelocityRef = useRef({ x: 0, y: 0 })
+    const smoothTouchRef = useRef({ x: 0, y: 0 })
 
     useEffect(() => {
         if (!containerRef.current) return
@@ -178,60 +182,93 @@ export default function ThreeBackground() {
             attributeFilter: ['class'] // Only watch for class changes
         })
 
-        // Device detection and gyroscope setup
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        // Device detection
         const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        
+        // Initialize touch device detection
+        if (hasTouch || isMobile) {
+            setIsTouchDevice(true)
+            console.log('Touch device detected')
+        }
 
-        // Request device orientation permission for iOS 13+
-        const requestGyroPermission = async () => {
-            // Type assertion for iOS DeviceOrientationEvent with requestPermission
-            const DeviceOrientationEventWithPermission = DeviceOrientationEvent as unknown as {
-                requestPermission?: () => Promise<'granted' | 'denied'>
+        // Touch handlers for mobile devices
+        const handleTouchStart = (event: TouchEvent) => {
+            if (event.touches.length > 0) {
+                const touch = event.touches[0]
+                lastTouchRef.current.x = touch.clientX
+                lastTouchRef.current.y = touch.clientY
+                isInteractingRef.current = false // Reset interaction state
+                
+                // Reset velocity
+                touchVelocityRef.current.x = 0
+                touchVelocityRef.current.y = 0
+                
+                // Initialize smooth touch position
+                smoothTouchRef.current.x = (touch.clientX / window.innerWidth) * 2 - 1
+                smoothTouchRef.current.y = -(touch.clientY / window.innerHeight) * 2 + 1
             }
-            
-            if (typeof DeviceOrientationEventWithPermission.requestPermission === 'function') {
-                try {
-                    const permission = await DeviceOrientationEventWithPermission.requestPermission()
-                    return permission === 'granted'
-                } catch (error) {
-                    console.log('Device orientation permission denied:', error)
-                    return false
+        }
+
+        const handleTouchMove = (event: TouchEvent) => {
+            if (event.touches.length > 0) {
+                const touch = event.touches[0]
+                
+                // Calculate movement delta to detect if user is scrolling vs interacting
+                const deltaX = Math.abs(touch.clientX - lastTouchRef.current.x)
+                const deltaY = Math.abs(touch.clientY - lastTouchRef.current.y)
+                
+                // Calculate velocity for momentum
+                const velocityX = (touch.clientX - lastTouchRef.current.x) * 0.1
+                const velocityY = (touch.clientY - lastTouchRef.current.y) * 0.1
+                
+                // Update normalized touch position
+                const normalizedX = (touch.clientX / window.innerWidth) * 2 - 1
+                const normalizedY = -(touch.clientY / window.innerHeight) * 2 + 1
+                
+                // If horizontal movement is greater than vertical, consider it interaction
+                // If vertical movement is greater, allow scrolling
+                if (deltaX > deltaY && deltaX > 5) {
+                    // Horizontal movement - interact with particles
+                    isInteractingRef.current = true
+                    
+                    // Update touch position and velocity
+                    touchRef.current.x = normalizedX
+                    touchRef.current.y = normalizedY
+                    touchVelocityRef.current.x = velocityX
+                    touchVelocityRef.current.y = velocityY
+                    
+                    // Prevent default only when we're interacting
+                    event.preventDefault()
+                } else if (deltaY > 5 && !isInteractingRef.current) {
+                    // Vertical movement - allow scrolling, but still update particle position gently
+                    touchRef.current.x = normalizedX
+                    touchRef.current.y = normalizedY
+                    touchVelocityRef.current.x = velocityX * 0.3
+                    touchVelocityRef.current.y = velocityY * 0.3
+                    
+                    // Don't prevent default - allow scrolling
+                } else {
+                    // Small movements - just update position smoothly
+                    touchRef.current.x = normalizedX
+                    touchRef.current.y = normalizedY
                 }
-            }
-            return true // Android or older iOS
-        }
-
-        // Initialize gyroscope if available
-        const initializeGyroscope = async () => {
-            if ((isMobile || hasTouch) && window.DeviceOrientationEvent) {
-                const hasPermission = await requestGyroPermission()
-                if (hasPermission) {
-                    setHasGyroscope(true)
-                    console.log('Gyroscope initialized')
-                }
+                
+                // Update last touch position
+                lastTouchRef.current.x = touch.clientX
+                lastTouchRef.current.y = touch.clientY
             }
         }
 
-        initializeGyroscope()
-
-        // Gyroscope handler
-        const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
-            if (event.beta !== null && event.gamma !== null) {
-                // Normalize gyroscope values to -1 to 1 range
-                // Beta: front-to-back tilt (-180 to 180)
-                // Gamma: left-to-right tilt (-90 to 90)
-                gyroRef.current.beta = Math.max(-90, Math.min(90, event.beta)) / 90
-                gyroRef.current.gamma = Math.max(-90, Math.min(90, event.gamma)) / 90
-
-                // Set target rotation based on device orientation
-                targetRotationRef.current.x = gyroRef.current.beta * 0.3
-                targetRotationRef.current.y = gyroRef.current.gamma * 0.3
-            }
+        const handleTouchEnd = () => {
+            isInteractingRef.current = false
+            // Keep some momentum after touch ends
+            // Velocity will naturally decay in the animation loop
         }
 
-        // Mouse movement handler (fallback for desktop)
+        // Mouse movement handler (for desktop devices)
         const handleMouseMove = (event: MouseEvent) => {
-            if (!hasGyroscope) {
+            if (!isTouchDevice) {
                 // Normalize mouse position to -1 to 1 range
                 mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1
                 mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1
@@ -278,16 +315,36 @@ export default function ThreeBackground() {
                 particlesRef.current.rotation.x += rotationSpeed
                 particlesRef.current.rotation.y += rotationSpeed * 1.5
 
-                // Camera movement based on input (gyroscope or mouse) with some automatic drift
+                // Camera movement based on input (touch or mouse) with some automatic drift
                 const driftIntensity = currentDarkMode ? 0.8 : 0.4
                 let inputX, inputY
                 
-                if (hasGyroscope) {
-                    // Use gyroscope data
-                    inputX = gyroRef.current.gamma
-                    inputY = gyroRef.current.beta
+                if (isTouchDevice) {
+                    // Smooth interpolation for touch input with momentum
+                    const lerpFactor = 0.08 // Smooth interpolation
+                    
+                    // Apply velocity for momentum
+                    touchVelocityRef.current.x *= 0.95 // Decay velocity
+                    touchVelocityRef.current.y *= 0.95
+                    
+                    // Update smooth touch position with momentum
+                    smoothTouchRef.current.x += (touchRef.current.x - smoothTouchRef.current.x) * lerpFactor
+                    smoothTouchRef.current.y += (touchRef.current.y - smoothTouchRef.current.y) * lerpFactor
+                    
+                    // Add velocity for momentum effect
+                    smoothTouchRef.current.x += touchVelocityRef.current.x * 0.01
+                    smoothTouchRef.current.y += touchVelocityRef.current.y * 0.01
+                    
+                    // Use smooth touch data
+                    inputX = smoothTouchRef.current.x
+                    inputY = smoothTouchRef.current.y
+                    
+                    // Update target rotation smoothly
+                    const rotationIntensity = isInteractingRef.current ? 0.3 : 0.1
+                    targetRotationRef.current.x += (inputY * rotationIntensity - targetRotationRef.current.x) * 0.1
+                    targetRotationRef.current.y += (inputX * rotationIntensity - targetRotationRef.current.y) * 0.1
                 } else {
-                    // Use mouse data
+                    // Use mouse data (already smooth)
                     inputX = mouseRef.current.x
                     inputY = mouseRef.current.y
                 }
@@ -295,8 +352,10 @@ export default function ThreeBackground() {
                 const targetCameraX = inputX * 2 + Math.sin(timeRef.current * 0.3) * driftIntensity
                 const targetCameraY = inputY * 2 + Math.cos(timeRef.current * 0.2) * driftIntensity
 
-                cameraRef.current.position.x += (targetCameraX - cameraRef.current.position.x) * 0.05
-                cameraRef.current.position.y += (targetCameraY - cameraRef.current.position.y) * 0.05
+                // Smoother camera movement for touch devices
+                const cameraLerpFactor = isTouchDevice ? 0.03 : 0.05
+                cameraRef.current.position.x += (targetCameraX - cameraRef.current.position.x) * cameraLerpFactor
+                cameraRef.current.position.y += (targetCameraY - cameraRef.current.position.y) * cameraLerpFactor
 
                 // Make camera look at the center with slight offset and automatic movement
                 const lookAtIntensity = currentDarkMode ? 3 : 2
@@ -329,9 +388,14 @@ export default function ThreeBackground() {
         window.addEventListener('mousemove', handleMouseMove)
         window.addEventListener('resize', handleResize)
         
-        // Add gyroscope event listener if available
-        if (hasGyroscope) {
-            window.addEventListener('deviceorientation', handleDeviceOrientation)
+        // Add touch event listeners for mobile devices
+        if (isTouchDevice) {
+            console.log('Adding touch event listeners')
+            window.addEventListener('touchstart', handleTouchStart, { passive: false })
+            window.addEventListener('touchmove', handleTouchMove, { passive: false })
+            window.addEventListener('touchend', handleTouchEnd, { passive: false })
+        } else {
+            console.log('Desktop device detected, using mouse input')
         }
 
         // Cleanup
@@ -342,9 +406,11 @@ export default function ThreeBackground() {
             window.removeEventListener('mousemove', handleMouseMove)
             window.removeEventListener('resize', handleResize)
             
-            // Remove gyroscope event listener if it was added
-            if (hasGyroscope) {
-                window.removeEventListener('deviceorientation', handleDeviceOrientation)
+            // Remove touch event listeners if they were added
+            if (isTouchDevice) {
+                window.removeEventListener('touchstart', handleTouchStart)
+                window.removeEventListener('touchmove', handleTouchMove)
+                window.removeEventListener('touchend', handleTouchEnd)
             }
             
             observer.disconnect()
@@ -357,7 +423,7 @@ export default function ThreeBackground() {
             material.dispose()
             rendererRef.current?.dispose()
         }
-    }, [isDarkMode, hasGyroscope]) // Add isDarkMode and hasGyroscope to dependency array
+    }, [isDarkMode, isTouchDevice]) // Add isDarkMode and isTouchDevice to dependency array
 
     return (
         <div
@@ -373,3 +439,4 @@ export default function ThreeBackground() {
         />
     )
 }
+
