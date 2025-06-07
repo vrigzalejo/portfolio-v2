@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Navigation from '@/components/Navigation'
 import HeroSection from '@/sections/HeroSection'
 import AboutSection from '@/sections/AboutSection'
@@ -6,11 +9,31 @@ import SkillsSection from '@/sections/SkillsSection'
 import ContactSection from '@/sections/ContactSection'
 import ThreeBackground from './components/ThreeBackground'
 import WorkSection from './sections/JobsSection'
+import PhotoSensitivityWarning from '@/components/PhotoSensitivityWarning'
+import CookieConsent from '@/components/CookieConsent'
 import Link from 'next/link'
 
 export default function Home() {
+  const [showWarning, setShowWarning] = useState(true)
+
+  const handleWarningAccept = () => {
+    setShowWarning(false)
+  }
+
+  const handleCookieConsent = (enabled: boolean) => {
+    // Here you can initialize or disable analytics based on consent
+    if (enabled) {
+      console.log('Analytics enabled')
+      // Initialize Google Analytics, etc.
+    } else {
+      console.log('Analytics disabled')
+      // Disable analytics tracking
+    }
+  }
   return (
     <>
+      {showWarning && <PhotoSensitivityWarning onAccept={handleWarningAccept} />}
+      <CookieConsent onAccept={handleCookieConsent} />
       <ThreeBackground />
       <Navigation />
       <main>
