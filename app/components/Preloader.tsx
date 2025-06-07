@@ -10,7 +10,7 @@ export default function Preloader() {
     const [loadingPhase, setLoadingPhase] = useState('Initializing')
 
     useEffect(() => {
-        // Initialize theme detection
+        // Initialize theme detection - matching the main website's approach
         const stored = localStorage.getItem('theme')
         let initialTheme
         if (stored) {
@@ -19,6 +19,8 @@ export default function Preloader() {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
             initialTheme = prefersDark ? 'dark' : 'light'
         }
+        
+        // Apply theme class to document element (same as main website)
         document.documentElement.classList.toggle('dark', initialTheme === 'dark')
 
         // Simulate loading progress with phases
