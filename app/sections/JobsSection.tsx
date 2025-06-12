@@ -12,22 +12,21 @@ export default function JobsSection() {
             company: "Elgada BPO Solutions Inc.", 
             account: "StreamlineVerify",
             description: [
-                "🛡️ Secured web applications with OWASP and AES encryption, reducing security incidents by 70%.",
-                "⚙️ Optimized microservices with AWS SQS and GUID workflows, cutting response times by 40%.",
-                "📈 Improved system observability with AWS CloudWatch, achieving 99.9% uptime.",
-                "🔐 Strengthened authentication with Argon2 hashing and OAuth2 flows.",
-                "🚀 Built scalable RESTful APIs with Laravel, Redis, and AWS, supporting 10x traffic growth.",
-                "🧱 Applied API rate-limiting with Nginx and Redis, preventing DDoS threats.",
-                "🔁 Migrated PHP systems (Kohana, Laravel, Symfony) with zero downtime.",
-                "📚 Documented APIs with Postman, Swagger, and Confluence, speeding onboarding by 50%.",
-                "🧑‍🏫 Mentored developers, increasing team productivity by 50%.",
-                "📋 Reduced backlogs by 90% with Agile workflows in Jira and GitHub.",
-                "🔄 Automated CI/CD with Git hooks and Jenkins, cutting deployment failures by 80%.",
-                "🤖 Developed bots with Django, Flask, Selenium, and Kubernetes, streamlining tasks by 60%.",
-                "🧠 Integrated AI-powered features with OpenAI APIs and ML models, boosting accuracy by 75%.",
-                "💻 Modernized full-stack systems with Django, React, Vue, TypeScript, and GraphQL.",
-                "📊 Improved big data processing with Elasticsearch, Sphinx, and Manticore, reducing retrieval time by 50%.",
-                "✅ Enhanced test automation with PyTest, JUnit, Jest, Selenium, and PHPUnit, increasing test coverage by 95%."
+                "🔒 Implemented OWASP Top 10 security standards, AES-256 encryption, and HIPAA compliance, reducing security incidents by 70%",
+                "⚡ Architected event-driven microservices with AWS Services, and GUID workflows, improving response times by 40%",
+                "📊 Deployed comprehensive observability stack with CloudWatch, and distributed tracing, achieving 99.9% uptime SLA",
+                "🚀 Built scalable Laravel APIs with Redis clustering, ElasticSearch indexing, AWS Services, and SQL optimization, supporting 10x traffic growth",
+                "🛡️ Implemented multi-layer rate-limiting preventing DDoS attacks",
+                "🔄 Executed zero-downtime legacy migration using Vagrant, Chef, Docker containers and Kubernetes orchestration",
+                "🔑 Enhanced authentication with Argon2 hashing, OAuth2, JWT, SSO integration, and Auth0 identity platform",
+                "📜 Created comprehensive API documentation with Postman collections, Docusaurus, OpenAPI 3.0, and Swagger, reducing onboarding time by 50%",
+                "🎓 Mentored development teams on clean architecture, SOLID principles, and modern practices, increasing productivity by 50%",
+                "📅 Streamlined Agile workflows with Jira, GitHub Actions, Teams automation, and real-time notifications, reducing project backlogs by 90%",
+                "🔁 Optimized GitOps CI/CD pipelines with Git hooks, Jenkins, cutting deployment failures by 80%",
+                "🤖 Developed intelligent automation bots with Django, Flask, FastAPI, streamlining workflows by 60%",
+                "🧠 Integrated AI features using OpenAI GPT-3.5 improving system accuracy by 75%",
+                "🌐 Modernized full-stack applications with React, Vue, Next.js, TypeScript, GraphQL Apollo, and WCAG compliance",
+                "✅ Achieved 95% test automation coverage using PyTest, Jest, Mocha, Chai, PHPUnit, Codeception"
             ]            
         },
         {
@@ -36,22 +35,21 @@ export default function JobsSection() {
             company: "ZigZag Media",
             account: "StreamlineVerify",
             description: [
-                "🛡️ Secured web applications with OWASP and AES encryption, reducing security incidents by 70%.",
-                "⚙️ Optimized microservices with AWS SQS and GUID workflows, cutting response times by 40%.",
-                "📈 Improved system observability with AWS CloudWatch, achieving 99.9% uptime.",
-                "🔐 Strengthened authentication with Argon2 hashing and OAuth2 flows.",
-                "🚀 Built scalable RESTful APIs with Laravel, Redis, and AWS, supporting 10x traffic growth.",
-                "🧱 Applied API rate-limiting with Nginx and Redis, preventing DDoS threats.",
-                "🔁 Migrated PHP systems (Kohana, Laravel, Symfony) with zero downtime.",
-                "📚 Documented APIs with Postman, Swagger, and Confluence, speeding onboarding by 50%.",
-                "🧑‍🏫 Mentored developers, increasing team productivity by 50%.",
-                "📋 Reduced backlogs by 90% with Agile workflows in Jira and GitHub.",
-                "🔄 Automated CI/CD with Git hooks and Jenkins, cutting deployment failures by 80%.",
-                "🤖 Developed bots with Django, Flask, Selenium, and Kubernetes, streamlining tasks by 60%.",
-                "🧠 Integrated AI-powered features with OpenAI APIs and ML models, boosting accuracy by 75%.",
-                "💻 Modernized full-stack systems with Django, React, Vue, TypeScript, and GraphQL.",
-                "📊 Improved big data processing with Elasticsearch, Sphinx, and Manticore, reducing retrieval time by 50%.",
-                "✅ Enhanced test automation with PyTest, JUnit, Jest, Selenium, and PHPUnit, increasing test coverage by 95%."
+                "🔒 Implemented OWASP Top 10 security standards, AES-256 encryption, and HIPAA compliance, reducing security incidents by 70%",
+                "⚡ Architected event-driven microservices with AWS Services, and GUID workflows, improving response times by 40%",
+                "📊 Deployed comprehensive observability stack with CloudWatch, and distributed tracing, achieving 99.9% uptime SLA",
+                "🚀 Built scalable Laravel APIs with Redis clustering, ElasticSearch indexing, AWS Services, and SQL optimization, supporting 10x traffic growth",
+                "🛡️ Implemented multi-layer rate-limiting preventing DDoS attacks",
+                "🔄 Executed zero-downtime legacy migration using Vagrant, Chef, Docker containers and Kubernetes orchestration",
+                "🔑 Enhanced authentication with Argon2 hashing, OAuth2, JWT, SSO integration, and Auth0 identity platform",
+                "📜 Created comprehensive API documentation with Postman collections, Docusaurus, OpenAPI 3.0, and Swagger, reducing onboarding time by 50%",
+                "🎓 Mentored development teams on clean architecture, SOLID principles, and modern practices, increasing productivity by 50%",
+                "📅 Streamlined Agile workflows with Jira, GitHub Actions, Teams automation, and real-time notifications, reducing project backlogs by 90%",
+                "🔁 Optimized GitOps CI/CD pipelines with Git hooks, Jenkins, cutting deployment failures by 80%",
+                "🤖 Developed intelligent automation bots with Django, Flask, FastAPI, streamlining workflows by 60%",
+                "🧠 Integrated AI features using OpenAI GPT-3.5 improving system accuracy by 75%",
+                "🌐 Modernized full-stack applications with React, Vue, Next.js, TypeScript, GraphQL Apollo, and WCAG compliance",
+                "✅ Achieved 95% test automation coverage using PyTest, Jest, Mocha, Chai, PHPUnit, Codeception"
             ]
         },
         {
@@ -60,17 +58,17 @@ export default function JobsSection() {
             company: "Ezy Outsourcing Hub",
             account: "Global WebForce",
             description: [
-                "👨‍💻 Led a team of 4 developers, delivering 10 projects ahead of schedule with a 95% client satisfaction rate.",
-                "🚀 Optimized AWS infrastructure (EC2, S3, RDS, ELB), ensuring high availability and secure deployments.",
-                "🤖 Developed and maintained Python bots with Selenium, automating workflows and saving 50+ hours monthly.",
-                "⚡ Streamlined Bitbucket repositories and automated CI/CD, cutting deployment times by 40%.",
-                "📚 Documented workflows and guides, improving onboarding efficiency by 30%.",
-                "🔧 Architected scalable backend solutions using Laravel, Symfony, and CodeIgniter, improving system efficiency by 50%.",
-                "💾 Designed and optimized database schemas in MySQL and MongoDB, reducing query execution time by 60%.",
-                "🌐 Spearheaded full-stack development using Vue.js and PHP frameworks, enhancing UI/UX responsiveness.",
-                "📢 Collaborated with stakeholders and cross-functional teams to align tech solutions with business goals.",
-                "🔄 Implemented robust API integrations with third-party services, reducing manual processes by 70%.",
-                "🖥️ Developed WordPress sites with Divi and Elementor, creating dynamic, high-converting pages."
+                "👨‍💻 Led a team of 4 developers to deliver enterprise-grade web platforms ahead of schedule with 95% client satisfaction.",
+                "🚀 Engineered scalable WordPress, Laravel, CodeIgniter, and Symfony backend systems with Redis caching and SQL optimizations, improving efficiency by 50%.",
+                "🔑 Implemented secure authentication flows using OAuth2 and JWT.",
+                "🤖 Deployed Python automation bots using Selenium to streamline QA and reporting workflows, saving 50+ hours monthly.",
+                "🌐 Modernized frontend stacks with Vue.js, React, and ES6 JavaScript; improved UX performance and accessibility with WCAG-compliant design.",
+                "🗄️ Designed relational and NoSQL schemas using MySQL and MongoDB with optimized indexing, reducing response time by 60%.",
+                "🔁 Refactored CI/CD pipelines with Bitbucket Pipelines, and Git hooks cutting deployment failures by 80%.",
+                "☁️ Led DevOps integration by optimizing Vagrant, Docker, AWS infrastructure using EC2, S3, RDS, and CloudWatch; ensured high availability and 99.9% uptime SLA.",
+                "📜 Created internal developer documentation with Postman collections, cutting onboarding time by 40%.",
+                "⚡ Streamlined Agile workflows with Slack automation, improving sprint velocity and reducing project backlogs by 70%.",
+                "🎓 Mentored junior developers in clean architecture, SOLID principles, and unit testing with PHPUnit, increasing team output by 50%."
             ]
         },
         {
@@ -78,29 +76,30 @@ export default function JobsSection() {
             title: "Jr. PHP Developer",
             company: "Datahold Philippines Inc.",
             description: [
-                "🤖 Built and maintained bots, web apps, WordPress, and Drupal sites, ensuring functionality and scalability.",
-                "⚡ Automated key processes with Node.js bots, saving 50+ hours of manual work monthly.",
-                "🔧 Enhanced system performance with Symfony, CodeIgniter, Zend, Yii, and Laravel, reducing response times by 25%.",
-                "🎨 Designed user-friendly UIs and email templates, boosting engagement by 30%.",
-                "💾 Optimized databases for faster data retrieval, improving efficiency by 25%.",
-                "📚 Documented workflows and created guides, streamlining onboarding by 30%.",
-                "🤝 Collaborated with cross-functional teams to ensure smooth project execution."
+                "🌐 Built and maintained web applications, including WordPress and Drupal sites, ensuring scalability.",
+                "🤖 Automated business processes with Node.js bots, saving over 50 hours monthly.",
+                "⚡ Enhanced system performance using PHP frameworks, reducing response times by 25%.",
+                "🎨 Designed user interfaces and email templates that increased engagement by 30%.",
+                "🗄️ Optimized database queries to improve retrieval efficiency by 25%.",
+                "🤝 Collaborated with cross-functional teams to ensure smooth project delivery."
             ]
         },
         {
             date: "June 2014 – August 2014",
-            title: "Intern",
+            title: "Intern (Web Developer)",
             company: "Commission on Human Rights of the Philippines",
             description: [
-                "📦 Optimized a procurement system with Laravel, Bootstrap, Nginx, HHVM, and Vagrant, cutting processing time by 70% and streamlining workflows."
+                "⚙️ Optimized a procurement system using Laravel, Bootstrap, Nginx, HHVM, and Vagrant.",
+                "⏳ Reduced processing time by 70% and streamlined organizational workflows."
             ]
         },
         {
             date: "March 2012 – May 2012",
-            title: "Intern",
+            title: "Intern (Web Developer)",
             company: "Commission on Human Rights of the Philippines",
             description: [
-                "📦 Developed a Procurement System as an intern using PHP, OOP, HTML, CSS, AJAX, and jQuery, cutting purchase order processing time by 50% and improving efficiency."
+                "🛒 Developed a procurement system using PHP, OOP, HTML, CSS, AJAX, and jQuery.",
+                "⏳ Reduced purchase order processing time by 50%, improving operational efficiency."
             ]
         },
     ];
