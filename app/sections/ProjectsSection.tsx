@@ -35,7 +35,7 @@ const projects: Project[] = [
         title: 'Esports Tracker',
         description: 'The ultimate tool for analyzing performance, tracking stats, and staying ahead in the competitive gaming arena.',
         gradient: 'from-blue-600 to-cyan-600',
-        tags: ['NextJS', 'Tailwind', 'TypeScript', 'REST API', 'Cors', 'Vercel'],
+        tags: ['NextJS', 'Tailwind', 'TypeScript', 'REST API', 'CORS', 'Vercel'],
         url: 'https://www.esports-tracker.com',
         cardImg: esportsTracker,
         cardHoverImg: esportsTrackerHover,
