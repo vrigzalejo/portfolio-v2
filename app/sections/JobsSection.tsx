@@ -7,7 +7,27 @@ import Timeline from '@/components/Timeline';
 export default function JobsSection() {
     const experiences = [
         {
-            date: "January 2020 – present", 
+            date: "June 2025 - present",
+            title: "Senior Backend Developer",
+            company: "AAK Tele-Science",
+            description: [
+                "🐛 Fixed critical bugs and integrated new features with Django, FastAPI, PostgreSQL, RabbitMQ, and microservices architecture, maintaining backend stability for 10,000+ users",
+                "👥 Led backend development team using Agile methodologies, improving team productivity by 40%",
+                "📋 Assigned tasks to team members using SaaS Board platform, sprint planning, and resource allocation strategies, streamlining project delivery by 30%",
+                "🔁 Created pre-release and production builds with Jenkins and GitHub CI/CD pipelines across development, staging, and production branches",
+                "🛡️ Ensured build stability with automated testing and quality assurance processes, achieving 99.5% successful deployment rate",
+                "👀 Conducted thorough PR reviews and cherry picks with Git workflows, code quality standards, and security best practices, maintaining 95% code coverage",
+                "🤝 Met with stakeholders regularly to align technical solutions with business requirements, reducing delivery time by 25%",
+                "🌐 Helped frontend team with ReactJS, Vite, TailwindCSS, TypeScript integration and connected components with backend RESTful APIs",
+                "🚀 Built scalable backend systems with Django REST framework, Redis caching, and performance optimization, supporting 10x traffic growth",
+                "📊 Implemented comprehensive monitoring with Grafana, Loki, and distributed logging for real-time system health tracking",
+                "🔄 Optimized message queuing systems with RabbitMQ, Celery task processing, and event-driven architecture, handling 100,000+ messages daily",
+                "🤖 Collaborated with AI team on feature development using FastAPI and Hugging Face transformers, improving ML model accuracy by 75%",
+                "🗃️ Designed and optimized Cassandra, ScyllaDB, and PostgreSQL schemas with advanced indexing and replication, improving query performance by 40%",
+            ]
+        },
+        {
+            date: "January 2020 – June 2025", 
             title: "Mid-Sr. PHP Developer", 
             company: "Elgada BPO Solutions Inc.", 
             account: "StreamlineVerify",
