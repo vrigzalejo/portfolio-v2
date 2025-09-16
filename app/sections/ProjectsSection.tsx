@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { StaticImageData } from 'next/image'
+import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react'
 import WaveText from "@/components/WaveText"
 import { ClipPathBorders } from "../components/ClipPathBorders"
 import HoverImage from "@/components/HoverImage"
 import ProjectModal from "@/components/ProjectModal"
-import { ExternalLink } from 'lucide-react';
-import { StaticImageData } from 'next/image';
+import { toSlug } from '@/lib/utils'
 import * as gtag from '@/lib/gtag'
 
 // ========================================
@@ -91,7 +92,9 @@ const svApiDocsImages = [
     svApiDocs11, svApiDocs12, svApiDocs13, svApiDocs14
 ];
 
-import { toSlug } from '@/lib/utils'
+// ========================================
+// TYPE DEFINITIONS
+// ========================================
 
 interface Project {
     id: number
@@ -172,6 +175,94 @@ const projects: Project[] = [
     }
 ]
 
+// ========================================
+// HELPER COMPONENTS
+// ========================================
+
+interface CollapsibleTagsProps {
+    tags: string[]
+    maxVisibleTags?: number
+}
+
+function CollapsibleTags({ tags, maxVisibleTags = 3 }: CollapsibleTagsProps) {
+    const [isExpanded, setIsExpanded] = useState(false)
+    
+    const hasMoreTags = tags.length > maxVisibleTags
+    const hiddenCount = tags.length - maxVisibleTags
+
+    return (
+        <div className="mb-4">
+            <div className="flex flex-wrap gap-2">
+                {/* Always visible tags */}
+                {tags.slice(0, maxVisibleTags).map((tag) => (
+                    <span
+                        key={tag}
+                        className="px-3 py-1 dark:bg-gray-600/30 bg-gray-600/80 text-white rounded-full text-sm"
+                    >
+                        {tag}
+                    </span>
+                ))}
+                
+                {/* Expandable tags with smooth animation */}
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <div className="flex flex-wrap gap-2">
+                        {tags.slice(maxVisibleTags).map((tag) => (
+                            <span
+                                key={`hidden-${tag}`}
+                                className={`px-3 py-1 dark:bg-gray-600/30 bg-gray-600/80 text-white rounded-full text-sm ${isExpanded ? 'animate-fadeInUp' : ''}`}
+                            >
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+                
+                {/* Toggle button */}
+                {hasMoreTags && (
+                    <button
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="px-3 py-1 bg-gray-500/50 hover:bg-gray-500/70 text-white rounded-full text-sm flex items-center gap-1 transition-colors"
+                        aria-label={isExpanded ? 'Show fewer tags' : `Show ${hiddenCount} more tags`}
+                    >
+                        {isExpanded ? (
+                            <>
+                                <ChevronUp className="w-3 h-3" />
+                                Less
+                            </>
+                        ) : (
+                            <>
+                                <ChevronDown className="w-3 h-3" />
+                                +{hiddenCount}
+                            </>
+                        )}
+                    </button>
+                )}
+            </div>
+            
+            <style jsx>{`
+                .animate-fadeInUp {
+                    animation: fadeInUp 0.3s ease-out forwards;
+                }
+                
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
+        </div>
+    )
+}
+
+// ========================================
+// MAIN COMPONENT
+// ========================================
+
 const title = '🚀 Featured Projects'
 
 export default function ProjectsSection() {
@@ -207,7 +298,10 @@ export default function ProjectsSection() {
                         <WaveText title={title} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-2 mb-8 sm:mb-12 lg:mb-16 font-bold" />
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {projects.map((project) => (
-                                <div key={project.id} className="bg-white/10 dark:bg-gray-900/90 backdrop-blur-md border border-white/20 dark:border-gray-700/50 p-6 rounded-2xl shadow-lg">
+                                <div 
+                                    key={project.id} 
+                                    className="bg-white/10 dark:bg-gray-900/90 backdrop-blur-md border border-white/20 dark:border-gray-700/50 p-6 rounded-2xl shadow-lg"
+                                >
                                     <div className="mb-6">
                                         <HoverImage
                                             primaryImage={project.cardImg}
@@ -220,16 +314,7 @@ export default function ProjectsSection() {
                                     </div>
                                     <h3 className="text-gray-900 dark:text-white text-xl font-semibold mb-3">{project.title}</h3>
                                     <p className="text-gray-500 dark:text-gray-200 mb-4">{project.description}</p>
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {project.tags.map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className='px-3 py-1 dark:bg-gray-600/30 bg-gray-600/80 text-white rounded-full text-sm'
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
+                                    <CollapsibleTags tags={project.tags} maxVisibleTags={3} />
                                     <button
                                         onClick={() => handleViewProject(project)}
                                         className="shadow-lg font-bold w-full py-2 rounded-lg text-gray-700 dark:text-white dark:bg-gray-300/30 hover:dark:bg-gray-300/60 bg-gray-600/10 hover:bg-gray-300/10 transition-all flex items-center justify-center gap-2"
